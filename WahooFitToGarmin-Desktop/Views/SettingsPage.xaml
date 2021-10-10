@@ -73,6 +73,16 @@
                             </i:Interaction.Triggers>
                         </RadioButton>
                     </StackPanel>
+                    <StackPanel  Margin="{StaticResource SmallTopBottomMargin}">
+                        <TextBlock
+                            Style="{StaticResource BodyTextStyle}"
+                            Text="{x:Static properties:Resources.SelectDropBoxWahooFitnessApplicationFolder}" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox Width="500"></TextBox>
+                            <Button Content="{x:Static properties:Resources.SelectFolder}">
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
                 </StackPanel>
 
                 <TextBlock
@@ -92,10 +102,9 @@
                     Margin="{StaticResource SmallTopMargin}"
                     AutomationProperties.Name="{Binding Text, ElementName=settingsPrivacyStatement}">
                     <Hyperlink
-                        Command="{Binding PrivacyStatementCommand}"
-                        AutomationProperties.Name="{Binding Text, ElementName=settingsPrivacyStatement}">
+                        Command="{Binding GithubUrlCommand}"
+                        AutomationProperties.Name="{Binding Text, ElementName=githubUrlStatement}">
                         <TextBlock
-                            x:Name="settingsPrivacyStatement"
                             Style="{StaticResource BodyTextStyle}"
                             Text="{x:Static properties:Resources.SettingsPagePrivacyStatementText}" />
                     </Hyperlink>

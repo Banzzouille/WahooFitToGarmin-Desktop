@@ -11,7 +11,6 @@ using WahooFitToGarmin_Desktop.Models;
 
 namespace WahooFitToGarmin_Desktop.ViewModels
 {
-    // TODO WTS: Change the URL for your privacy policy in the appsettings.json file, currently set to https://YourPrivacyUrlGoesHere
     public class SettingsViewModel : ObservableObject, INavigationAware
     {
         private readonly AppConfig _appConfig;
@@ -21,7 +20,8 @@ namespace WahooFitToGarmin_Desktop.ViewModels
         private AppTheme _theme;
         private string _versionDescription;
         private ICommand _setThemeCommand;
-        private ICommand _privacyStatementCommand;
+        private ICommand _githubUrlCommand;
+        private ICommand _selectWahooFolderCommand;
 
         public AppTheme Theme
         {
@@ -35,9 +35,11 @@ namespace WahooFitToGarmin_Desktop.ViewModels
             set { SetProperty(ref _versionDescription, value); }
         }
 
-        public ICommand SetThemeCommand => _setThemeCommand ?? (_setThemeCommand = new RelayCommand<string>(OnSetTheme));
+        public ICommand SetThemeCommand => _setThemeCommand ??= new RelayCommand<string>(OnSetTheme);
 
-        public ICommand PrivacyStatementCommand => _privacyStatementCommand ?? (_privacyStatementCommand = new RelayCommand(OnPrivacyStatement));
+        public ICommand GithubUrlCommand => _githubUrlCommand ??= new RelayCommand(OnGithubUrl);
+
+        public ICommand SelectWahooFolderCommand => _selectWahooFolderCommand ??= new RelayCommand(OnSelectWahooFolder);
 
         public SettingsViewModel(IOptions<AppConfig> appConfig, IThemeSelectorService themeSelectorService, ISystemService systemService, IApplicationInfoService applicationInfoService)
         {
@@ -63,7 +65,31 @@ namespace WahooFitToGarmin_Desktop.ViewModels
             _themeSelectorService.SetTheme(theme);
         }
 
-        private void OnPrivacyStatement()
-            => _systemService.OpenInWebBrowser(_appConfig.PrivacyStatement);
+        private void OnGithubUrl()
+            => _systemService.OpenInWebBrowser(_appConfig.GithubUrl);
+
+        private void OnSelectWahooFolder()
+        {
+            var dlg = new CommonOpenFileDialog();
+            dlg.Title = "My Title";
+            dlg.IsFolderPicker = true;
+            dlg.InitialDirectory = currentDirectory;
+
+            dlg.AddToMostRecentlyUsedList = false;
+            dlg.AllowNonFileSystemItems = false;
+            dlg.DefaultDirectory = currentDirectory;
+            dlg.EnsureFileExists = true;
+            dlg.EnsurePathExists = true;
+            dlg.EnsureReadOnly = false;
+            dlg.EnsureValidNames = true;
+            dlg.Multiselect = false;
+            dlg.ShowPlacesList = true;
+
+            if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                var folder = dlg.FileName;
+                // Do something with selected folder string
+            }
+        }
     }
 }
