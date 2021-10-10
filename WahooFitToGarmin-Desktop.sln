@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31702.278
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WahooFitToGarmin-Desktop", "WahooFitToGarmin-Desktop\WahooFitToGarmin-Desktop.csproj", "{CCE20A88-2961-4502-B077-1636F265F183}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WahooFitToGarmin-Desktop", "WahooFitToGarmin-Desktop\WahooFitToGarmin-Desktop.csproj", "{04AF72C4-2710-4A81-B848-4537B167D204}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WahooFitToGarmin-Desktop.Core", "WahooFitToGarmin-Desktop.Core\WahooFitToGarmin-Desktop.Core.csproj", "{03721157-EF90-44DE-9181-AEBF515275E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +13,19 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CCE20A88-2961-4502-B077-1636F265F183}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CCE20A88-2961-4502-B077-1636F265F183}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CCE20A88-2961-4502-B077-1636F265F183}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CCE20A88-2961-4502-B077-1636F265F183}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04AF72C4-2710-4A81-B848-4537B167D204}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04AF72C4-2710-4A81-B848-4537B167D204}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04AF72C4-2710-4A81-B848-4537B167D204}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04AF72C4-2710-4A81-B848-4537B167D204}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03721157-EF90-44DE-9181-AEBF515275E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03721157-EF90-44DE-9181-AEBF515275E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03721157-EF90-44DE-9181-AEBF515275E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03721157-EF90-44DE-9181-AEBF515275E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {AC0EA095-9F2E-4F11-BAFE-F97063F9DC12}
+		SolutionGuid = {86DBF3CF-D7A4-49CE-9FD4-D28FE25EF4A6}
 	EndGlobalSection
 EndGlobal

@@ -1,32 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>WahooFitToGarmin_Desktop</RootNamespace>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>Resources\garmin-wahoo-logo.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>garmin-wahoo-logo.ico</ApplicationIcon>
   </PropertyGroup>
-
   <ItemGroup>
-    <Compile Remove="Assets\**" />
-    <EmbeddedResource Remove="Assets\**" />
-    <None Remove="Assets\**" />
-    <Page Remove="Assets\**" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.6" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.16" />
+    <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.0.2" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.0.2" />
   </ItemGroup>
-
   <ItemGroup>
-    <None Remove="Resources\garmin-wahoo-logo.ico" />
-    <None Remove="Resources\garmin-wahoo-logo.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MaterialDesignThemes" Version="4.2.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Resources\garmin-wahoo-logo.ico" />
-    <Resource Include="Resources\garmin-wahoo-logo.png" />
+    <ProjectReference Include="..\WahooFitToGarmin-Desktop.Core\WahooFitToGarmin-Desktop.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,9 +27,14 @@
 
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

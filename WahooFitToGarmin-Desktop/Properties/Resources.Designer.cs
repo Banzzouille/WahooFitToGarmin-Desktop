@@ -10,8 +10,7 @@
 
 namespace WahooFitToGarmin_Desktop.Properties {
     using System;
-    
-    
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -22,21 +21,21 @@ namespace WahooFitToGarmin_Desktop.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
-        
+    public class Resources {
+
         private static global::System.Resources.ResourceManager resourceMan;
-        
+
         private static global::System.Globalization.CultureInfo resourceCulture;
-        
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Resources() {
         }
-        
+
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WahooFitToGarmin_Desktop.Properties.Resources", typeof(Resources).Assembly);
@@ -45,13 +44,13 @@ namespace WahooFitToGarmin_Desktop.Properties {
                 return resourceMan;
             }
         }
-        
+
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -59,24 +58,139 @@ namespace WahooFitToGarmin_Desktop.Properties {
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
+        ///   Looks up a localized string similar to wts.ItemName.
         /// </summary>
-        internal static byte[] garmin_wahoo_logo {
+        public static string AppDisplayName {
             get {
-                object obj = ResourceManager.GetObject("garmin_wahoo_logo", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("AppDisplayName", resourceCulture);
             }
         }
-        
+    
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
+        ///   Looks up a localized string similar to ShellGoBackButton.
         /// </summary>
-        internal static byte[] garmin_wahoo_logo1 {
+        public static string ShellGoBackButton {
             get {
-                object obj = ResourceManager.GetObject("garmin_wahoo_logo1", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("ShellGoBackButton", resourceCulture);
+            }
+        }
+    
+        /// <summary>
+        ///   Looks up a localized string similar to ShellHamburgerButtonName.
+        /// </summary>
+        public static string ShellHamburgerButtonName {
+            get {
+                return ResourceManager.GetString("ShellHamburgerButtonName", resourceCulture);
+            }
+        }
+    
+        /// <summary>
+        ///   Looks up a localized string similar to Main.
+        /// </summary>
+        public static string MainPageTitle {
+            get {
+                return ResourceManager.GetString("MainPageTitle", resourceCulture);
+            }
+        }
+    
+        /// <summary>
+        ///   Looks up a localized string similar to Main.
+        /// </summary>
+        public static string ShellMainPage {
+            get {
+                return ResourceManager.GetString("ShellMainPage", resourceCulture);
+            }
+        }
+    
+        /// <summary>
+            ///   Looks up a localized string similar to Settings page placeholder text.  Your app description goes here..
+            /// </summary>
+            public static string SettingsPageAboutText {
+                get {
+                    return ResourceManager.GetString("SettingsPageAboutText", resourceCulture);
+                }
+            }
+    
+            /// <summary>
+            ///   Looks up a localized string similar to About this application.
+            /// </summary>
+            public static string SettingsPageAboutTitle {
+                get {
+                    return ResourceManager.GetString("SettingsPageAboutTitle", resourceCulture);
+                }
+            }
+    
+            /// <summary>
+            ///   Looks up a localized string similar to Choose Theme.
+            /// </summary>
+            public static string SettingsPageChooseThemeText {
+                get {
+                    return ResourceManager.GetString("SettingsPageChooseThemeText", resourceCulture);
+                }
+            }
+    
+            /// <summary>
+            ///   Looks up a localized string similar to Personalization.
+            /// </summary>
+            public static string SettingsPagePersonalizationTitle {
+                get {
+                    return ResourceManager.GetString("SettingsPagePersonalizationTitle", resourceCulture);
+                }
+            }
+    
+            /// <summary>
+            ///   Looks up a localized string similar to Privacy Statement.
+            /// </summary>
+            public static string SettingsPagePrivacyStatementText {
+                get {
+                    return ResourceManager.GetString("SettingsPagePrivacyStatementText", resourceCulture);
+                }
+            }
+    
+            /// <summary>
+            ///   Looks up a localized string similar to Dark.
+            /// </summary>
+            public static string SettingsPageRadioButtonDarkTheme {
+                get {
+                    return ResourceManager.GetString("SettingsPageRadioButtonDarkTheme", resourceCulture);
+                }
+            }
+    
+            /// <summary>
+            ///   Looks up a localized string similar to Light.
+            /// </summary>
+            public static string SettingsPageRadioButtonLightTheme {
+                get {
+                    return ResourceManager.GetString("SettingsPageRadioButtonLightTheme", resourceCulture);
+                }
+            }
+    
+            /// <summary>
+            ///   Looks up a localized string similar to Default.
+            /// </summary>
+            public static string SettingsPageRadioButtonWindowsDefaultTheme {
+                get {
+                    return ResourceManager.GetString("SettingsPageRadioButtonWindowsDefaultTheme", resourceCulture);
+                }
+            }
+    
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string SettingsPageTitle {
+            get {
+                return ResourceManager.GetString("SettingsPageTitle", resourceCulture);
+            }
+        }
+    
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string ShellSettingsPage {
+            get {
+                return ResourceManager.GetString("ShellSettingsPage", resourceCulture);
             }
         }
     }
