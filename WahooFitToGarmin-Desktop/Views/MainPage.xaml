@@ -6,8 +6,50 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:properties="clr-namespace:WahooFitToGarmin_Desktop.Properties"
+    xmlns:local="clr-namespace:WahooFitToGarmin_Desktop.Helpers"
     mc:Ignorable="d"
     d:DesignHeight="450" d:DesignWidth="800">
+    <Page.Resources>
+        <Style TargetType="ItemsControl" x:Key="LogViewerStyle">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <ScrollViewer CanContentScroll="True">
+                            <ItemsPresenter/>
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel IsItemsHost="True"/>
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate DataType="{x:Type local:LogEntry}">
+            <Grid IsSharedSizeScope="True">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="Index" Width="Auto"/>
+                    <ColumnDefinition SharedSizeGroup="Date" Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="{Binding DateTime}" Grid.Column="0"
+                       FontWeight="Bold" Margin="5,0,5,0"/>
+
+                <TextBlock Text="{Binding Index}" Grid.Column="1"
+                       FontWeight="Bold" Margin="0,0,2,0" />
+
+                <TextBlock Text="{Binding Message}" Grid.Column="2"
+                       TextWrapping="Wrap"/>
+            </Grid>
+        </DataTemplate>
+
+    </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="48" />
@@ -25,6 +67,13 @@
             The Mahapps Gray10 color represents where you should place your content.
             Place your content here.
             -->
+            <DockPanel>
+                <TextBlock Text="{Binding Count, StringFormat='{}{0} Items'}"
+                           DockPanel.Dock="Top"/>
+
+                <ItemsControl ItemsSource="{Binding LogEntries}" Style="{StaticResource LogViewerStyle}">
+                </ItemsControl>
+            </DockPanel>
         </Grid>
     </Grid>
 </Page>
