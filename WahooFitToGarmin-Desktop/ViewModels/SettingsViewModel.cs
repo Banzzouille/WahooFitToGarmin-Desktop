@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Windows.Forms;
 using System.Windows.Input;
 
 using Microsoft.Extensions.Options;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
-
 using WahooFitToGarmin_Desktop.Contracts.Services;
 using WahooFitToGarmin_Desktop.Contracts.ViewModels;
 using WahooFitToGarmin_Desktop.Models;
@@ -19,6 +19,7 @@ namespace WahooFitToGarmin_Desktop.ViewModels
         private readonly IApplicationInfoService _applicationInfoService;
         private AppTheme _theme;
         private string _versionDescription;
+        private string _wahooDropBoxFolder;
         private ICommand _setThemeCommand;
         private ICommand _githubUrlCommand;
         private ICommand _selectWahooFolderCommand;
@@ -27,6 +28,12 @@ namespace WahooFitToGarmin_Desktop.ViewModels
         {
             get { return _theme; }
             set { SetProperty(ref _theme, value); }
+        }
+
+        public string WahooDropBoxFolder
+        {
+            get { return _wahooDropBoxFolder; }
+            set { SetProperty(ref _wahooDropBoxFolder, value); }
         }
 
         public string VersionDescription
@@ -53,6 +60,7 @@ namespace WahooFitToGarmin_Desktop.ViewModels
         {
             VersionDescription = $"{Properties.Resources.AppDisplayName} - {_applicationInfoService.GetVersion()}";
             Theme = _themeSelectorService.GetCurrentTheme();
+            WahooDropBoxFolder = App.Current.Properties["WahooDropBoxFolder"].ToString();
         }
 
         public void OnNavigatedFrom()
@@ -70,26 +78,15 @@ namespace WahooFitToGarmin_Desktop.ViewModels
 
         private void OnSelectWahooFolder()
         {
-            var dlg = new CommonOpenFileDialog();
-            dlg.Title = "My Title";
-            dlg.IsFolderPicker = true;
-            dlg.InitialDirectory = currentDirectory;
+            var folderDlg = new FolderBrowserDialog();
+            folderDlg.ShowNewFolderButton = false;
+            // Show the FolderBrowserDialog.  
+            var result = folderDlg.ShowDialog();
+            if (result != DialogResult.OK) return;
 
-            dlg.AddToMostRecentlyUsedList = false;
-            dlg.AllowNonFileSystemItems = false;
-            dlg.DefaultDirectory = currentDirectory;
-            dlg.EnsureFileExists = true;
-            dlg.EnsurePathExists = true;
-            dlg.EnsureReadOnly = false;
-            dlg.EnsureValidNames = true;
-            dlg.Multiselect = false;
-            dlg.ShowPlacesList = true;
-
-            if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                var folder = dlg.FileName;
-                // Do something with selected folder string
-            }
+            WahooDropBoxFolder = folderDlg.SelectedPath;
+            _appConfig.WahooDropBoxFolder = folderDlg.SelectedPath;
+            App.Current.Properties["WahooDropBoxFolder"] = folderDlg.SelectedPath;
         }
     }
 }

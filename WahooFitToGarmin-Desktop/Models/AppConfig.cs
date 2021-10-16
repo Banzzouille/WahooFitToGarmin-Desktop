@@ -7,5 +7,7 @@
         public string AppPropertiesFileName { get; set; }
 
         public string GithubUrl { get; set; }
+
+        public string WahooDropBoxFolder { get; set; }
     }
 }

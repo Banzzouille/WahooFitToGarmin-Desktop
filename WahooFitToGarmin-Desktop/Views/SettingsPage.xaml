@@ -78,8 +78,8 @@
                             Style="{StaticResource BodyTextStyle}"
                             Text="{x:Static properties:Resources.SelectDropBoxWahooFitnessApplicationFolder}" />
                         <StackPanel Orientation="Horizontal">
-                            <TextBox Width="500"></TextBox>
-                            <Button Content="{x:Static properties:Resources.SelectFolder}">
+                            <TextBox Width="500" Text="{Binding WahooDropBoxFolder}"></TextBox>
+                            <Button Content="{x:Static properties:Resources.SelectFolder}" Command="{Binding SelectWahooFolderCommand}">
                             </Button>
                         </StackPanel>
                     </StackPanel>
