@@ -18,7 +18,7 @@ namespace WahooFitToGarmin_Desktop.Services
             ToastNotificationManagerCompat.CreateToastNotifier().Show(toastNotification);
         }
 
-        public void ShowToastNotification(string title, string body)
+        public void ShowSimpleToastNotification(string title, string body)
         {
             var content = new ToastContent()
             {

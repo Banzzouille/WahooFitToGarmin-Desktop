@@ -16,6 +16,7 @@ namespace WahooFitToGarmin_Desktop.ViewModels
     {
         private readonly IToastNotificationsService _toastNotificationsService;
         private string wahooFolder;
+
         public ObservableCollection<LogEntry> LogEntries { get; set; }
 
         public MainViewModel(IToastNotificationsService toastNotificationsService)
@@ -24,15 +25,22 @@ namespace WahooFitToGarmin_Desktop.ViewModels
             LogEntries = new ObservableCollection<LogEntry> { new LogEntry("Starting .......") };
             DumpSettings();
 
-
-            var fw = new FileSystemWatcher
+            if (Directory.Exists(wahooFolder))
             {
-                Filter = "*.fit",
-                Path = wahooFolder,
-                EnableRaisingEvents = true,
-                IncludeSubdirectories = false
-            };
-            fw.Created += fileIsComing;
+                var fw = new FileSystemWatcher
+                {
+                    Filter = "*.fit",
+                    Path = wahooFolder,
+                    EnableRaisingEvents = true,
+                    IncludeSubdirectories = false
+                };
+                fw.Created += fileIsComing;
+            }
+            else
+            {
+                Log("Please select a good directory in settings and restart the application");
+            }
+
         }
 
         private void fileIsComing(object sender, FileSystemEventArgs e)
