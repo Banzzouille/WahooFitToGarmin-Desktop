@@ -38,13 +38,10 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="{Binding DateTime}" Grid.Column="0"
+                <TextBlock Text="{Binding LogDateTime}" Grid.Column="0"
                        FontWeight="Bold" Margin="5,0,5,0"/>
 
-                <TextBlock Text="{Binding Index}" Grid.Column="1"
-                       FontWeight="Bold" Margin="0,0,2,0" />
-
-                <TextBlock Text="{Binding Message}" Grid.Column="2"
+                <TextBlock Text="{Binding LogMessage}" Grid.Column="2"
                        TextWrapping="Wrap"/>
             </Grid>
         </DataTemplate>

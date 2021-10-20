@@ -11,11 +11,7 @@ namespace WahooFitToGarmin_Desktop.ViewModels
         public MainViewModel()
         {
             LogEntries = new ObservableCollection<LogEntry>();
-            LogEntries.Add(new LogEntry
-            {
-                DateTime = DateTime.Now,
-                Message = "Test"
-            });
+            LogEntries.Add(new LogEntry("Starting ......."));
 
         }
     }
