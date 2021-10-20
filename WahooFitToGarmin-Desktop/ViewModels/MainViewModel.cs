@@ -3,18 +3,24 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
+using Windows.Data.Xml.Dom;
+using Windows.UI.Notifications;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Microsoft.Toolkit.Uwp.Notifications;
+using WahooFitToGarmin_Desktop.Contracts.Services;
 using WahooFitToGarmin_Desktop.Helpers;
 
 namespace WahooFitToGarmin_Desktop.ViewModels
 {
     public class MainViewModel : ObservableObject
     {
+        private readonly IToastNotificationsService _toastNotificationsService;
         private string wahooFolder;
         public ObservableCollection<LogEntry> LogEntries { get; set; }
 
-        public MainViewModel()
+        public MainViewModel(IToastNotificationsService toastNotificationsService)
         {
+            _toastNotificationsService = toastNotificationsService;
             LogEntries = new ObservableCollection<LogEntry> { new LogEntry("Starting .......") };
             DumpSettings();
 
@@ -32,6 +38,7 @@ namespace WahooFitToGarmin_Desktop.ViewModels
         private void fileIsComing(object sender, FileSystemEventArgs e)
         {
             Log($"A new file is coming => {e.Name}");
+            _toastNotificationsService.ShowSimpleToastNotification("A new file is coming", e.Name);
         }
 
         private void DumpSettings()

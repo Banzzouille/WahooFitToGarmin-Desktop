@@ -66,7 +66,6 @@ namespace WahooFitToGarmin_Desktop.Services
         {
             if (!_isInitialized)
             {
-                _toastNotificationsService.ShowToastNotificationSample();
                 await Task.CompletedTask;
             }
         }

@@ -4,8 +4,8 @@ namespace WahooFitToGarmin_Desktop.Contracts.Services
 {
     public interface IToastNotificationsService
     {
-        public abstract void ShowToastNotification(ToastNotification toastNotification);
+        public void ShowToastNotification(ToastNotification toastNotification);
+        public void ShowSimpleToastNotification(string title, string body);
 
-        public abstract void ShowToastNotificationSample();
     }
 }
