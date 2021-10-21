@@ -1,0 +1,3 @@
+[submodule "garmin-uploader"]
+	path = garmin-uploader
+	url = https://github.com/La0/garmin-uploader.git

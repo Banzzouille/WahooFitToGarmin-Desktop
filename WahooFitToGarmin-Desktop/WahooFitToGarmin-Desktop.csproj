@@ -10,7 +10,13 @@
 		<Version>0.1.0</Version>
 	</PropertyGroup>
 	<ItemGroup>
+	  <Content Include="..\garmin-uploader\garmin_uploader\help.txt" Link="garmin-uploader\help.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+	<ItemGroup>
 		<PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
+		<PackageReference Include="IronPython" Version="2.7.11" />
 		<PackageReference Include="MahApps.Metro" Version="2.4.9" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
 		<PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.0" />
@@ -39,5 +45,27 @@
 		<None Update="appsettings.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="garmin-uploader\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\garmin-uploader\garmin_uploader\api.py" Link="garmin-uploader\api.py">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Include="..\garmin-uploader\garmin_uploader\cli.py" Link="garmin-uploader\cli.py">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Include="..\garmin-uploader\garmin_uploader\user.py" Link="garmin-uploader\user.py">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Include="..\garmin-uploader\garmin_uploader\workflow.py" Link="garmin-uploader\workflow.py">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Include="..\garmin-uploader\garmin_uploader\__init__.py" Link="garmin-uploader\__init__.py">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 </Project>
