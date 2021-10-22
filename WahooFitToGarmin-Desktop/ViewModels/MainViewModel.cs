@@ -13,6 +13,8 @@ namespace WahooFitToGarmin_Desktop.ViewModels
     {
         private readonly IToastNotificationsService _toastNotificationsService;
         private string wahooFolder;
+        private string garminLogin;
+        private string garminPwd;
 
         public ObservableCollection<LogEntry> LogEntries { get; set; }
 
@@ -61,6 +63,11 @@ namespace WahooFitToGarmin_Desktop.ViewModels
                 Log("Please select folder to watch for in settings");
 
             Log($"Wahoo folder to watch for : {wahooFolder}");
+
+            garminLogin = App.Current.Properties["GarminLogin"].ToString();
+            garminPwd = App.Current.Properties["GarminPwd"].ToString();
+            if (string.IsNullOrEmpty(garminLogin) || string.IsNullOrEmpty(garminPwd))
+                Log("Please enter your Garmin login and password in settings");
         }
 
         private void Log(string message)

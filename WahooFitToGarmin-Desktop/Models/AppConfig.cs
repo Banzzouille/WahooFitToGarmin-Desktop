@@ -9,5 +9,9 @@
         public string GithubUrl { get; set; }
 
         public string WahooDropBoxFolder { get; set; }
+
+        public string GarminLogin { get; set; }
+
+        public string GarminPwd { get; set; }
     }
 }

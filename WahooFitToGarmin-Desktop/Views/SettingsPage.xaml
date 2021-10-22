@@ -83,6 +83,16 @@
                             </Button>
                         </StackPanel>
                     </StackPanel>
+                    <StackPanel  Margin="{StaticResource SmallTopBottomMargin}">
+                        <TextBlock Text="Garmin Info :"></TextBlock>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource BodyTextStyle}" Text="Login" />
+                            <TextBox Width="500" Text="{Binding GarminLogin}"></TextBox>
+                        </StackPanel><StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource BodyTextStyle}" Text="Password" />
+                            <TextBox Width="500" Text="{Binding GarminPwd}"></TextBox>
+                        </StackPanel>
+                    </StackPanel>
                 </StackPanel>
 
                 <TextBlock

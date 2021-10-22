@@ -20,26 +20,50 @@ namespace WahooFitToGarmin_Desktop.ViewModels
         private AppTheme _theme;
         private string _versionDescription;
         private string _wahooDropBoxFolder;
+        private string _garminLogin;
+        private string _garminPwd;
         private ICommand _setThemeCommand;
         private ICommand _githubUrlCommand;
         private ICommand _selectWahooFolderCommand;
 
         public AppTheme Theme
         {
-            get { return _theme; }
-            set { SetProperty(ref _theme, value); }
+            get => _theme;
+            set => SetProperty(ref _theme, value);
+        }
+
+        public string GarminLogin
+        {
+            get => _garminLogin;
+            set
+            {
+                SetProperty(ref _garminLogin, value);
+                _appConfig.GarminLogin = value;
+                App.Current.Properties["GarminLogin"] = value;
+            }
+        }
+
+        public string GarminPwd
+        {
+            get => _garminPwd;
+            set
+            {
+                SetProperty(ref _garminPwd, value);
+                _appConfig.GarminPwd = value;
+                App.Current.Properties["GarminPwd"] = value;
+            }
         }
 
         public string WahooDropBoxFolder
         {
-            get { return _wahooDropBoxFolder; }
-            set { SetProperty(ref _wahooDropBoxFolder, value); }
+            get => _wahooDropBoxFolder;
+            set => SetProperty(ref _wahooDropBoxFolder, value);
         }
 
         public string VersionDescription
         {
-            get { return _versionDescription; }
-            set { SetProperty(ref _versionDescription, value); }
+            get => _versionDescription;
+            set => SetProperty(ref _versionDescription, value);
         }
 
         public ICommand SetThemeCommand => _setThemeCommand ??= new RelayCommand<string>(OnSetTheme);
@@ -61,6 +85,8 @@ namespace WahooFitToGarmin_Desktop.ViewModels
             VersionDescription = $"{Properties.Resources.AppDisplayName} - {_applicationInfoService.GetVersion()}";
             Theme = _themeSelectorService.GetCurrentTheme();
             WahooDropBoxFolder = App.Current.Properties["WahooDropBoxFolder"].ToString();
+            GarminLogin = App.Current.Properties["GarminLogin"].ToString();
+            GarminPwd = App.Current.Properties["GarminPwd"].ToString();
         }
 
         public void OnNavigatedFrom()
