@@ -26,20 +26,20 @@ Here, when you finish your next activty, a fit file will be directly send to you
 
 ## 2. Install Dropbox Client
 
-You can found a installation link [here](https://www.dropbox.com/downloading)
+You can find an installation link [here](https://www.dropbox.com/downloading)
 
 ## 3. Install WahooFitToGarmin-Desktop app
 
 Simply unzip the file you donwload on Github where you want.   
 Start the application by double click on "WahooFitToGarmin-Desktop.exe"  
 
-Set your personnals information in the settings tab
+Set your personnal information in the settings tab
 ![Settings.jpg](/Pictures/settings.png)
 
 Then restart the app to take it in account.
 
 
-File will be discovered when new file appear in the DropBox folder you have selected
+File will be discovered when new file appears in the DropBox folder you have selected below
 ![Example interface.png](/Pictures/Example_interface.png)
 
 
@@ -47,7 +47,7 @@ File will be discovered when new file appear in the DropBox folder you have sele
 
 ## 4. Additionnal actions
 
-To have an autostart app (starting with Windows) you can add a shortcut to the exe file in this folder : C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup  
+To have an autostart app (starting with Windows) you can add a shortcut of the exe file in this folder : C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup  
 
 Your data will be stored here : C:\Users\%username%\AppData\Local\WahooFitToGarmin_Desktop
 
@@ -60,5 +60,5 @@ Your data will be stored here : C:\Users\%username%\AppData\Local\WahooFitToGarm
 
 
 All your information will be saved in this folder in CLEAR TEXT.  
-If your are not agree to enter your garmin Id, DON'T USE THIS APP !!!!
+If your don't agree with this, DON'T USE THIS APP !!!!
 
