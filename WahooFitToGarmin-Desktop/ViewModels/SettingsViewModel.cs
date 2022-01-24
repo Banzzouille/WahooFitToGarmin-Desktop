@@ -84,9 +84,9 @@ namespace WahooFitToGarmin_Desktop.ViewModels
         {
             VersionDescription = $"{Properties.Resources.AppDisplayName} - {_applicationInfoService.GetVersion()}";
             Theme = _themeSelectorService.GetCurrentTheme();
-            WahooDropBoxFolder = App.Current.Properties["WahooDropBoxFolder"].ToString();
-            GarminLogin = App.Current.Properties["GarminLogin"].ToString();
-            GarminPwd = App.Current.Properties["GarminPwd"].ToString();
+            WahooDropBoxFolder = App.Current.Properties["WahooDropBoxFolder"]?.ToString();
+            GarminLogin = App.Current.Properties["GarminLogin"]?.ToString();
+            GarminPwd = App.Current.Properties["GarminPwd"]?.ToString();
         }
 
         public void OnNavigatedFrom()
