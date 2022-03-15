@@ -10,7 +10,7 @@ I didn't want to continue to synchronize manually each time i do an activity bet
 
 - I use auto export functionality to DropBox directly from Wahoo compagnon app
 - Install the Dropbox client on your computer
-- Install dot net core 3.1 framework from here [.NET Desktop Runtime 3.1.23](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-3.1.23-windows-x64-installer)
+- Install .NET Core 3.1 Desktop Runtime from here [.NET Desktop Runtime 3.1.23](https://dotnet.microsoft.com/en-us/download/dotnet/3.1)
 - Download and Unzip the app on your computer
 
 # Step by step Guide
