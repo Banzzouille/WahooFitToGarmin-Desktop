@@ -22,6 +22,7 @@ namespace WahooFitToGarmin_Desktop.ViewModels
         private string _wahooDropBoxFolder;
         private string _garminLogin;
         private string _garminPwd;
+        private bool _keepUploadedActivityFile;
         private ICommand _setThemeCommand;
         private ICommand _githubUrlCommand;
         private ICommand _selectWahooFolderCommand;
@@ -30,6 +31,17 @@ namespace WahooFitToGarmin_Desktop.ViewModels
         {
             get => _theme;
             set => SetProperty(ref _theme, value);
+        }
+
+        public bool KeepUploadedActivityFile
+        {
+            get => _keepUploadedActivityFile;
+            set
+            {
+                SetProperty(ref _keepUploadedActivityFile, value);
+                _appConfig.KeepUploadedActivityFile = value;
+                App.Current.Properties["KeepUploadedActivityFile"] = value;
+            }
         }
 
         public string GarminLogin
@@ -87,6 +99,9 @@ namespace WahooFitToGarmin_Desktop.ViewModels
             WahooDropBoxFolder = App.Current.Properties["WahooDropBoxFolder"]?.ToString();
             GarminLogin = App.Current.Properties["GarminLogin"]?.ToString();
             GarminPwd = App.Current.Properties["GarminPwd"]?.ToString();
+            bool keepFile ;
+            bool.TryParse(App.Current.Properties["KeepUploadedActivityFile"]?.ToString(),out keepFile);
+            KeepUploadedActivityFile = keepFile;
         }
 
         public void OnNavigatedFrom()

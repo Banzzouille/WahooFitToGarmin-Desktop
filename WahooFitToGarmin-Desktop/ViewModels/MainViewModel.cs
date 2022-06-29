@@ -17,6 +17,7 @@ namespace WahooFitToGarmin_Desktop.ViewModels
         private string _wahooFolder;
         private string _garminLogin;
         private string _garminPwd;
+        private bool _keepFile;
         private ApiClient _api;
 
         public ObservableCollection<LogEntry> LogEntries { get; set; }
@@ -64,6 +65,10 @@ namespace WahooFitToGarmin_Desktop.ViewModels
 
             _garminLogin = App.Current.Properties["GarminLogin"]?.ToString();
             _garminPwd = App.Current.Properties["GarminPwd"]?.ToString();
+
+            bool.TryParse(App.Current.Properties["KeepUploadedActivityFile"]?.ToString(), out var keepFile);
+            _keepFile = keepFile;
+
             if (string.IsNullOrEmpty(_garminLogin) || string.IsNullOrEmpty(_garminPwd))
                 Log("Please enter your Garmin login and password in settings");
         }
@@ -113,7 +118,8 @@ namespace WahooFitToGarmin_Desktop.ViewModels
                 if (!string.IsNullOrEmpty(response.DetailedImportResult.UploadId))
                 {
                     Log($"Successful upload for file {file}");
-                    System.IO.File.Delete(file);
+                    if(!_keepFile)
+                        System.IO.File.Delete(file);
                 }
 
             }

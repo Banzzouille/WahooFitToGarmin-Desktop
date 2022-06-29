@@ -83,12 +83,18 @@
                             </Button>
                         </StackPanel>
                     </StackPanel>
+
+                    <StackPanel  Margin="{StaticResource SmallTopBottomMargin}">
+                        <CheckBox IsChecked="{Binding KeepUploadedActivityFile,Mode=TwoWay}" >Keep uploaded activity file</CheckBox>
+                    </StackPanel>
+
                     <StackPanel  Margin="{StaticResource SmallTopBottomMargin}">
                         <TextBlock Text="Garmin Info :"></TextBlock>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Style="{StaticResource BodyTextStyle}" Text="Login" />
                             <TextBox Width="500" Text="{Binding GarminLogin}"></TextBox>
-                        </StackPanel><StackPanel Orientation="Horizontal">
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
                             <TextBlock Style="{StaticResource BodyTextStyle}" Text="Password" />
                             <TextBox Width="500" Text="{Binding GarminPwd}"></TextBox>
                         </StackPanel>
