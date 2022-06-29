@@ -7,7 +7,7 @@
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<ApplicationIcon>garmin-wahoo-logo.ico</ApplicationIcon>
 		<UseWindowsForms>true</UseWindowsForms>
-		<Version>0.1.0</Version>
+		<Version>1.0.1</Version>
 	</PropertyGroup>
 	<ItemGroup>
 	  <Compile Remove="garmin-uploader\**" />
@@ -16,13 +16,13 @@
 	  <Page Remove="garmin-uploader\**" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Flurl.Http" Version="3.2.1" />
+		<PackageReference Include="Flurl.Http" Version="3.2.4" />
 		<PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
-		<PackageReference Include="IronPython" Version="2.7.11" />
+		<PackageReference Include="IronPython" Version="2.7.12" />
 		<PackageReference Include="MahApps.Metro" Version="2.4.9" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
-		<PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.0" />
-		<PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.0" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+		<PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
+		<PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.2" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\WahooFitToGarmin-Desktop.Core\WahooFitToGarmin-Desktop.Core.csproj" />

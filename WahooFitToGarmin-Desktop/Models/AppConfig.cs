@@ -13,5 +13,7 @@
         public string GarminLogin { get; set; }
 
         public string GarminPwd { get; set; }
+
+        public bool KeepUploadedActivityFile { get; set; }
     }
 }

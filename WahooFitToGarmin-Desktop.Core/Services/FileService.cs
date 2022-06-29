@@ -4,6 +4,7 @@ using System.Text;
 using Newtonsoft.Json;
 
 using WahooFitToGarmin_Desktop.Core.Contracts.Services;
+using WahooFitToGarmin_Desktop.Core.Helpers;
 
 namespace WahooFitToGarmin_Desktop.Core.Services
 {
@@ -14,7 +15,11 @@ namespace WahooFitToGarmin_Desktop.Core.Services
             var path = Path.Combine(folderPath, fileName);
             if (File.Exists(path))
             {
-                var json = File.ReadAllText(path);
+                var fileContent = File.ReadAllText(path);
+                if (fileContent.StartsWith("{"))
+                    return JsonConvert.DeserializeObject<T>(fileContent);
+
+                var json = StringExtensions.DecodeBase64(fileContent, Encoding.UTF8);
                 return JsonConvert.DeserializeObject<T>(json);
             }
 
@@ -29,7 +34,8 @@ namespace WahooFitToGarmin_Desktop.Core.Services
             }
 
             var fileContent = JsonConvert.SerializeObject(content);
-            File.WriteAllText(Path.Combine(folderPath, fileName), fileContent, Encoding.UTF8);
+            var obfuscatedSettings = StringExtensions.EncodeBase64(fileContent, Encoding.UTF8);
+            File.WriteAllText(Path.Combine(folderPath, fileName), obfuscatedSettings, Encoding.UTF8);
         }
 
         public void Delete(string folderPath, string fileName)
