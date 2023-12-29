@@ -2,11 +2,11 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using WahooFitToGarmin_Desktop.Contracts.Services;
+using WahooFitToGarmin_Desktop.Core.GARMIN;
 using WahooFitToGarmin_Desktop.Helpers;
 
 namespace WahooFitToGarmin_Desktop.ViewModels
@@ -18,12 +18,14 @@ namespace WahooFitToGarmin_Desktop.ViewModels
         private string _garminLogin;
         private string _garminPwd;
         private bool _keepFile;
-        private ApiClient _api;
+        //private ApiClient _api;
+        private IClient _client;
 
         public ObservableCollection<LogEntry> LogEntries { get; set; }
 
         public MainViewModel(IToastNotificationsService toastNotificationsService)
         {
+           
             _toastNotificationsService = toastNotificationsService;
             LogEntries = new ObservableCollection<LogEntry> { new LogEntry("Starting .......") };
             DumpSettings();
@@ -43,6 +45,7 @@ namespace WahooFitToGarmin_Desktop.ViewModels
             {
                 Log("Please feel correctly yours app settings in settings screen and restart the application to apply them");
             }
+            Log("Starting uploader ......");
 
         }
 
@@ -79,48 +82,43 @@ namespace WahooFitToGarmin_Desktop.ViewModels
                 () => { LogEntries.Add(new LogEntry(message)); });
         }
 
-        private async Task UploadAsync(string email,string password,string file)
+        private async Task UploadAsync(string email, string password, string file)
         {
             Debug.WriteLine($"{nameof(MainViewModel)}.{nameof(UploadAsync)}");
 
             Log("Connection to Garmin Connect server");
-                _api = new ApiClient(email, password);
-                var resultInitAuth = await _api.InitAuth();
-                Log(resultInitAuth);
-            
+            //_api = new ApiClient(email, password);
+            if (_client==null || _client.OAuth2Token == null)
+            {
+                _client = await ClientFactory.Create();
+                var authResult = await _client.Authenticate(email, password);
+                if (authResult.IsSuccess)
+                {
+                    Log("Connection success.");
+                }
+            }
+
             try
             {
                 Log($"Uploading file {file}");
-                var response = await _api.UploadActivity(file).ConfigureAwait(false);
+                var response = await _client.UploadActivity(Path.GetExtension(file).Remove(0, 1), File.ReadAllBytes(file), file).ConfigureAwait(false);
 
-                var result = response.DetailedImportResult;
-
-                if (result.Failures.Any())
+                if (response != null)
                 {
-                    foreach (var failure in result.Failures)
+                    if (response.DetailedImportResult != null)
                     {
-                        if (failure.Messages.Any())
+                        if (response.DetailedImportResult.successes.Count > 0)
                         {
-                            foreach (var message in failure.Messages)
-                            {
-                                if (message.Code == 202)
-                                {
-                                    Log($"Activity already uploaded {result.FileName}" );
-                                }
-                                else
-                                {
-                                    Log($"Failed to upload activity to Garmin. Message: {message}" );
-                                }
-                            }
+                            Log($"Activity uploaded {file}");
+                            Log($"Activity uploaded :{response.DetailedImportResult.successes[0].Messages?[0].Content}");
+                        }
+                        else if (response.DetailedImportResult.failures.Count > 0)
+                        {
+                            Log($"Failed to upload activity to Garmin : {response.DetailedImportResult.failures[0].Messages?[0].Content}");
                         }
                     }
                 }
-                if (!string.IsNullOrEmpty(response.DetailedImportResult.UploadId))
-                {
-                    Log($"Successful upload for file {file}");
-                    if(!_keepFile)
-                        System.IO.File.Delete(file);
-                }
+
 
             }
             catch (Exception e)
