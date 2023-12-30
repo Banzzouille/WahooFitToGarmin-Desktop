@@ -29,7 +29,6 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
             catch (FlurlHttpException ex)
             {
                 _authStatus = AuthStatus.InitCookiesError;
-                this._logger.Error(ex, "Failed on first step of authentication flow. Init Cookies");
                 throw new GarminClientException(_authStatus, ex.Message, ex);
             }
 
@@ -57,7 +56,6 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
             }
             catch (FlurlHttpException ex)
             {
-                this._logger.Error(ex, "Failed to fetch csrf token from Garmin.");
                 throw new GarminClientException(_authStatus, ex.Message, ex);
             }
 
@@ -85,11 +83,9 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
                 {
                     _authStatus = AuthStatus.AuthBlockedByCloudFlare;
                     var errorMessage = "Garmin Authentication Failed. Blocked by CloudFlare.";
-                    this._logger.Error(ex, errorMessage);
                     throw new GarminClientException(_authStatus, ex.Message, ex);
                 }
                 _authStatus = AuthStatus.AuthenticationFailed;
-                this._logger.Error(ex, "Garmin Authentication Failed.");
                 throw new GarminClientException(_authStatus, ex.Message, ex);
             }
             catch (FlurlHttpException ex)
@@ -113,7 +109,6 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
                 catch (FlurlHttpException ex)
                 {
                     _authStatus = AuthStatus.MFACSRFTokenNotFound;
-                    this._logger.Error(ex, "Failed to fetch MFA csrf token from Garmin.");
                     throw new GarminClientException(_authStatus, ex.Message, ex);
                 }
 
@@ -135,19 +130,16 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
             {
                 _authStatus = AuthStatus.SuccessButCouldNotFindServiceTicket;
                 var errorMessage = "Auth appeared successful but failed to find regex match for service ticket.";
-                this._logger.Error(errorMessage);
                 throw new GarminClientException(_authStatus, errorMessage);
             }
 
             var ticket = ticketMatch.Groups.ToKeyValuePairs().FirstOrDefault(t=>string.Equals(t.Key,"ticket")).Value.ToString();
            
-            _logger.Debug($"Ticket: {ticket}");
 
             if (string.IsNullOrWhiteSpace(ticket))
             {
                 _authStatus = AuthStatus.SuccessButTicketIsEmpty;
                 var errorMessage = "Auth appeared successful, and found service ticket, but ticket was null or empty.";
-                this._logger.Error(errorMessage);
                 throw new GarminClientException(_authStatus, errorMessage);
             }
             _authStatus = AuthStatus.InitialAuthSuccessful;
@@ -182,7 +174,6 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
             if (_authStatus != AuthStatus.MFARedirected)
             {
                 var message = "Not Redirected to MFA";
-                this._logger.Error(message);
                 throw new GarminClientException(_authStatus, message);
             }
 
@@ -210,11 +201,9 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
                 {
                     _authStatus = AuthStatus.MFAAuthBlockedByCloudFlare;
                     var errorMessage = "MFA: Garmin Authentication Failed. Blocked by CloudFlare.";
-                    this._logger.Error(ex, errorMessage);
                     throw new GarminClientException(_authStatus, ex.Message, ex);
                 }
                 _authStatus = AuthStatus.InvalidMFACode;
-                this._logger.Error(ex, "MFA: Garmin Authentication Failed. MFA Code rejected by Garmin. ");
                 throw new GarminClientException(_authStatus, ex.Message, ex);
             }
         }
@@ -304,12 +293,10 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
             catch (FlurlHttpException ex)
             {
                 var error = await ex.GetResponseStringAsync();
-                _logger.Error($"Error during OAuth1 handling, returned from {ex.Call.Request.Url}: {ex.Message}");
             }
             catch (Exception ex)
             {
                 _authStatus = AuthStatus.OAuth1TokensProblem;
-                _logger.Error($"Error during OAuth1 handling: {ex.Message}");
                 throw new GarminClientException(_authStatus, ex.Message, ex);
             }
 
@@ -350,12 +337,10 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
             catch (FlurlHttpException ex)
             {
                 var error = await ex.GetResponseStringAsync();
-                _logger.Error($"Error during OAuth2 handling, returned from {ex.Call.Request.Url}: {ex.Message}");
             }
             catch (Exception ex)
             {
                 _authStatus = AuthStatus.OAuth2TokensProblem;
-                _logger.Error($"Error during OAuth2 handling: {ex.Message}");
                 throw new GarminClientException(_authStatus, ex.Message, ex);
 
             }
@@ -378,7 +363,6 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
 
                 var csrfToken = match.Groups.ToKeyValuePairs().FirstOrDefault(t => string.Equals(t.Key, "csrf")).Value.ToString();
 
-                _logger.Debug($"Csrf Token: {csrfToken}");
 
                 if (string.IsNullOrWhiteSpace(csrfToken))
                 {

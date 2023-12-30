@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Flurl.Http;
-using NLog;
 using WahooFitToGarmin_Desktop.Core.GARMIN.Dto;
 using WahooFitToGarmin_Desktop.Core.GARMIN.Dto.Garmin;
 
@@ -28,12 +26,10 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
             source = URLs.SSO_EMBED_URL,
         };
 
-        private ILogger _logger => NLog.LogManager.GetLogger("Client");
         public OAuth2Token OAuth2Token { get; private set; }
         public DateTime _oAuth2TokenValidUntil { get; private set; }
 
 
-        private Client() { }
         internal Client(string consumerKey, string consumerSecret)
         {
 
@@ -54,8 +50,6 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
                 return DateTime.UtcNow < _oAuth2TokenValidUntil;
             }
         }
-
-
 
         public async Task<UploadResponse> UploadActivity(string format, byte[] file, string filePath)
         {
@@ -85,40 +79,11 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
 
             catch (FlurlHttpException ex)
             {
-                this._logger.Error(ex, "Failed to upload activity to Garmin. Flur Exception.");
+                throw ex;
             }
             catch (Exception ex)
             {
-                this._logger.Error(ex, "Failed to upload activity to Garmin.");
-            }
-            finally
-            {
-                if (response != null)
-                {
-                    var result = response.DetailedImportResult;
-
-                    if (result.failures.Any())
-                    {
-                        foreach (var failure in result.failures)
-                        {
-                            if (failure.Messages.Any())
-                            {
-                                foreach (var message in failure.Messages)
-                                {
-                                    if (message.Code == 202)
-                                    {
-                                        _logger.Info("Activity already uploaded", result.fileName);
-                                    }
-                                    else
-                                    {
-                                        _logger.Error("Failed to upload activity to Garmin. Message:", message);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
+                throw ex;
             }
             return response;
         }

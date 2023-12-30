@@ -24,7 +24,7 @@ namespace WahooFitToGarmin_Desktop.ViewModels
 
         public MainViewModel(IToastNotificationsService toastNotificationsService)
         {
-           
+
             _toastNotificationsService = toastNotificationsService;
             LogEntries = new ObservableCollection<LogEntry> { new LogEntry("Starting .......") };
             DumpSettings();
@@ -84,17 +84,20 @@ namespace WahooFitToGarmin_Desktop.ViewModels
         private async Task UploadAsync(string email, string password, string file)
         {
             Debug.WriteLine($"{nameof(MainViewModel)}.{nameof(UploadAsync)}");
-
-            Log("Connection to Garmin Connect server");
-            //_api = new ApiClient(email, password);
-            if (_client==null || _client.OAuth2Token == null)
+            
+            if (_client == null || _client.OAuth2Token == null)
             {
+                Log("Connection to Garmin Connect server");
                 _client = await ClientFactory.Create();
                 var authResult = await _client.Authenticate(email, password);
                 if (authResult.IsSuccess)
                 {
                     Log("Connection success.");
                 }
+            }
+            else
+            {
+                Log("Already logged.");
             }
 
             try
@@ -106,7 +109,7 @@ namespace WahooFitToGarmin_Desktop.ViewModels
                 {
                     if (response.DetailedImportResult != null)
                     {
-                        if (response.DetailedImportResult.successes.Count > 0)
+                        if (response.DetailedImportResult.uploadUuid != null)
                         {
                             Log($"Activity uploaded {file}");
                             Log($"Activity uploaded :{response.DetailedImportResult.successes[0].Messages?[0].Content}");
@@ -124,7 +127,7 @@ namespace WahooFitToGarmin_Desktop.ViewModels
             }
             catch (Exception e)
             {
-                Log($"Failed to upload workout {file} : {e.Message}");
+                Log($"Failed to upload activity {file} : {e.Message}");
             }
         }
     }

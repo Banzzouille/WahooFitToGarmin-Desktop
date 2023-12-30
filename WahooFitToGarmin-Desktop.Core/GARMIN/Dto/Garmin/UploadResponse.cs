@@ -11,7 +11,7 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN.Dto.Garmin
 
     public class DetailedImportResult
     {
-        //public long uploadId { get; set; }
+        //public string uploadId { get; set; }
         public UploadUuid uploadUuid { get; set; }
         public int owner { get; set; }
         public int fileSize { get; set; }
