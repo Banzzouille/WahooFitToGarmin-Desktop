@@ -16,7 +16,7 @@
 	  <Page Remove="garmin-uploader\**" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Flurl.Http" Version="3.2.4" />
+		<PackageReference Include="Flurl.Http" Version="4.0.0" />
 		<PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
 		<PackageReference Include="IronPython" Version="2.7.12" />
 		<PackageReference Include="MahApps.Metro" Version="2.4.9" />
