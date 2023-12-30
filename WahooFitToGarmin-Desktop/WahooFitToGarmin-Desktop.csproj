@@ -7,7 +7,7 @@
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<ApplicationIcon>garmin-wahoo-logo.ico</ApplicationIcon>
 		<UseWindowsForms>true</UseWindowsForms>
-		<Version>1.0.1</Version>
+		<Version>1.1.0</Version>
 	</PropertyGroup>
 	<ItemGroup>
 	  <Compile Remove="garmin-uploader\**" />
@@ -18,7 +18,6 @@
 	<ItemGroup>
 		<PackageReference Include="Flurl.Http" Version="3.2.4" />
 		<PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
-		<PackageReference Include="IronPython" Version="2.7.12" />
 		<PackageReference Include="MahApps.Metro" Version="2.4.9" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
