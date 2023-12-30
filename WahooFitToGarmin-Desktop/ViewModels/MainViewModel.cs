@@ -18,7 +18,6 @@ namespace WahooFitToGarmin_Desktop.ViewModels
         private string _garminLogin;
         private string _garminPwd;
         private bool _keepFile;
-        //private ApiClient _api;
         private IClient _client;
 
         public ObservableCollection<LogEntry> LogEntries { get; set; }
@@ -111,6 +110,8 @@ namespace WahooFitToGarmin_Desktop.ViewModels
                         {
                             Log($"Activity uploaded {file}");
                             Log($"Activity uploaded :{response.DetailedImportResult.successes[0].Messages?[0].Content}");
+                            if (!_keepFile)
+                                System.IO.File.Delete(file);
                         }
                         else if (response.DetailedImportResult.failures.Count > 0)
                         {
