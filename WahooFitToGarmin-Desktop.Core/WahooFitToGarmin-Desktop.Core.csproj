@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>WahooFitToGarmin_Desktop.Core</RootNamespace>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +13,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Flurl.Http" Version="4.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="OAuth.DotNetCore" Version="3.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="GARMIN\Dto\Garmin\Fit\" />
   </ItemGroup>
 </Project>
