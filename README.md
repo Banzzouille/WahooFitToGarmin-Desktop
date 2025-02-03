@@ -6,6 +6,10 @@ I have been a Garmin device user for a long time. I swithed to Wahoo bike unit a
 
 I didn't want to continue to synchronize manually each time i do an activity between these 2 plateforms.
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Banzzouille/WahooFitToGarmin,Banzzouille/WahooFitToGarmin-Desktop&type=Date)](https://star-history.com/#Banzzouille/WahooFitToGarmin&Banzzouille/WahooFitToGarmin-Desktop&Date)
+
 # What you need
 
 - I use auto export functionality to DropBox directly from Wahoo compagnon app
