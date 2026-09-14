@@ -76,18 +76,18 @@
 
 ## 7. Discovery
 
-- [ ] 7.1 Implement the watcher source: `.fit` filter, non-recursive, enqueue only
-- [ ] 7.2 Implement the startup scan
-- [ ] 7.3 Start the watcher before the startup scan so nothing arriving during the scan is lost
-- [ ] 7.4 Implement first-run baseline: record existing files as processed without uploading
-- [ ] 7.5 Log the number of files baselined
-- [ ] 7.6 Restart the watcher when the watched folder setting changes
-- [ ] 7.7 Log and keep running when no folder is configured, and start watching as soon as one is supplied
-- [ ] 7.8 Log and keep running when the configured folder does not exist
-- [ ] 7.9 Test: a file seen by both the scan and the watcher is processed exactly once
-- [ ] 7.10 Test: first run baselines existing files with no upload
-- [ ] 7.11 Test: the second run processes a file that arrived after the baseline
-- [ ] 7.12 Test: changing the watched folder moves watching without a restart
+- [x] 7.1 Implement the watcher source: `.fit` filter, non-recursive, enqueue only
+- [x] 7.2 Implement the startup scan
+- [x] 7.3 Start the watcher before the startup scan so nothing arriving during the scan is lost
+- [x] 7.4 Implement first-run baseline: record existing files as processed without uploading
+- [x] 7.5 Log the number of files baselined
+- [x] 7.6 Restart the watcher when the watched folder setting changes
+- [x] 7.7 Log and keep running when no folder is configured, and start watching as soon as one is supplied
+- [x] 7.8 Log and keep running when the configured folder does not exist
+- [x] 7.9 Test: a file seen by both the scan and the watcher is processed exactly once
+- [x] 7.10 Test: first run baselines existing files with no upload
+- [x] 7.11 Test: the second run processes a file that arrived after the baseline
+- [x] 7.12 Test: changing the watched folder moves watching without a restart
 
 ## 8. Session
 
