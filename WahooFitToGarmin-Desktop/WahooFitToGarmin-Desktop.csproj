@@ -32,12 +32,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Flurl.Http" />
-		<PackageReference Include="Hardcodet.NotifyIcon.Wpf" />
 		<PackageReference Include="MahApps.Metro" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" />
 		<PackageReference Include="CommunityToolkit.Mvvm" />
 		<PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" />
+		<PackageReference Include="Serilog" />
 		<PackageReference Include="Serilog.Extensions.Hosting" />
 		<PackageReference Include="Serilog.Sinks.File" />
 	</ItemGroup>

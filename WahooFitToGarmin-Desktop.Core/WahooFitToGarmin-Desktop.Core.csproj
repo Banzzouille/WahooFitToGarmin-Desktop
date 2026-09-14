@@ -15,6 +15,9 @@
     <PackageReference Include="Flurl.Http" />
     <PackageReference Include="OAuth.DotNetCore" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <!-- Abstractions only: the core library defines a hosted service but
+         does not host anything. -->
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
   </ItemGroup>
 
   <ItemGroup>

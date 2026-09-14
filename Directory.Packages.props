@@ -4,21 +4,18 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
-  <ItemGroup Label="Shared">
-    <PackageVersion Include="Flurl.Http" Version="4.0.0" />
-  </ItemGroup>
-
   <ItemGroup Label="Core">
+    <PackageVersion Include="Flurl.Http" Version="4.0.2" />
     <PackageVersion Include="OAuth.DotNetCore" Version="3.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.12" />
   </ItemGroup>
 
   <ItemGroup Label="Desktop">
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
-    <PackageVersion Include="MahApps.Metro" Version="2.4.9" />
-    <PackageVersion Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.2" />
-    <PackageVersion Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
+    <PackageVersion Include="MahApps.Metro" Version="2.4.11" />
+    <PackageVersion Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
   </ItemGroup>
 
   <ItemGroup Label="Logging">

@@ -64,7 +64,7 @@
 - [x] 6.8 Implement retention: delete only on confirmed success with retention off; retain on duplicate, failure, and retention on
 - [x] 6.9 Implement the processed, failed, and duplicate counters with change notification
 - [x] 6.10 Ensure an unexpected exception is logged, counted as a failure, and does not stop the worker
-- [ ] 6.11 Preserve the log message wording recorded in 1.4
+- [x] 6.11 Preserve the log message wording recorded in 1.4
 - [x] 6.12 Test: transient failure retried then succeeding is counted as processed
 - [x] 6.13 Test: retries stop at the configured maximum
 - [x] 6.14 Test: a client error is not retried
@@ -91,25 +91,33 @@
 
 ## 8. Session
 
-- [ ] 8.1 Implement the session abstraction over the existing Garmin client
-- [ ] 8.2 Honour the client's existing validity property instead of testing for a non-null token
-- [ ] 8.3 Renew before upload when the session is invalid
-- [ ] 8.4 Log the reason and count a failure when renewal fails, retaining the source file
-- [ ] 8.5 Test: an expired session is renewed before the upload
-- [ ] 8.6 Test: a valid session is reused without re-authenticating
+- [x] 8.1 Implement the session abstraction over the existing Garmin client
+- [x] 8.2 Honour the client's existing validity property instead of testing for a non-null token
+- [x] 8.3 Renew before upload when the session is invalid
+- [x] 8.4 Log the reason and count a failure when renewal fails, retaining the source file
+- [x] 8.5 Test: an expired session is renewed before the upload
+- [x] 8.6 Test: a valid session is reused without re-authenticating
 
 ## 9. Host wiring and user interface
 
-- [ ] 9.1 Register the pipeline as a hosted service in the existing generic host
-- [ ] 9.2 Register the settings store, record, session, and abstractions in the container
+- [x] 9.1 Register the pipeline as a hosted service in the existing generic host
+- [x] 9.2 Register the settings store, record, session, and abstractions in the container
 - [x] 9.3 Implement the WPF notifier over the existing toast service
 - [x] 9.4 Implement the WPF folder picker over the existing folder dialog
 - [x] 9.5 Implement the WPF dispatcher over the existing application dispatcher
-- [ ] 9.6 Reduce `MainViewModel` to log display and counters; remove watcher construction, authentication, upload, and deletion
+- [x] 9.6 Reduce `MainViewModel` to log display and counters; remove watcher construction, authentication, upload, and deletion
 - [x] 9.7 Bind `SettingsViewModel` to the settings store; remove the `App.Current.Properties` writes
 - [x] 9.8 Delete `PersistAndRestoreService` and its interface
-- [ ] 9.9 Remove the "restart the application to apply" message and any other restart instruction
-- [ ] 9.10 Verify no view model constructs a watcher, reads files, authenticates, uploads, or deletes
+- [x] 9.9 Remove the "restart the application to apply" message and any other restart instruction
+- [x] 9.10 Verify no view model constructs a watcher, reads files, authenticates, uploads, or deletes
+
+## 9b. Dependency cleanup
+
+- [x] 9b.1 Remove `Hardcodet.NotifyIcon.Wpf`, referenced since the project began and never used once: there is no tray icon anywhere in the application
+- [x] 9b.2 Remove the desktop project's direct `Flurl.Http` reference; it is only used by the core library and reached the desktop project transitively
+- [x] 9b.3 Reference `Serilog` explicitly in the desktop project, which uses its types directly and was relying on a transitive reference
+- [x] 9b.4 Update `Flurl.Http` to 4.0.2, `MahApps.Metro` to 2.4.11, `Microsoft.Toolkit.Uwp.Notifications` to 7.1.3
+- [x] 9b.5 Confirm no package is reported as outdated, deprecated or vulnerable
 
 ## 10. End-to-end verification
 

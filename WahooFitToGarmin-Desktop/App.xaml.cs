@@ -20,6 +20,7 @@ using WahooFitToGarmin_Desktop.Contracts.Activation;
 using WahooFitToGarmin_Desktop.Contracts.Services;
 using WahooFitToGarmin_Desktop.Contracts.Views;
 using WahooFitToGarmin_Desktop.Core.Contracts.Services;
+using WahooFitToGarmin_Desktop.Core.Activities;
 using WahooFitToGarmin_Desktop.Core.Platform;
 using WahooFitToGarmin_Desktop.Core.Services;
 using WahooFitToGarmin_Desktop.Core.Settings;
@@ -102,6 +103,10 @@ namespace WahooFitToGarmin_Desktop
             // App Host
             services.AddHostedService<ApplicationHostService>();
 
+            // The activity pipeline: discovery, readiness, transformation,
+            // upload, retention. Runs for the application's lifetime.
+            services.AddHostedService<ActivityPipelineHostedService>();
+
             // Activation Handlers
             services.AddSingleton<IActivationHandler, ToastNotificationActivationHandler>();
 
@@ -133,6 +138,53 @@ namespace WahooFitToGarmin_Desktop
                     Path.Combine(localAppData, relative),
                     appConfig.SettingsFileName ?? "Settings.json");
             });
+
+            // Activity pipeline and everything it depends on.
+            services.AddSingleton<IFileSystemProbe, FileSystemProbe>();
+            services.AddSingleton<IActivityFileStore, ActivityFileStore>();
+            services.AddSingleton<IProcessedActivityRecord>(sp =>
+            {
+                var appConfig = sp.GetRequiredService<IOptions<AppConfig>>().Value;
+                var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                var relative = (appConfig.ConfigurationsFolder ?? Path.Combine("WahooFitToGarmin_Desktop", "Configurations"))
+                    .Replace('\\', Path.DirectorySeparatorChar)
+                    .Replace('/', Path.DirectorySeparatorChar);
+
+                return new ProcessedActivityRecord(
+                    Path.Combine(localAppData, relative, "ProcessedActivities.json"),
+                    sp.GetRequiredService<ILogger<ProcessedActivityRecord>>());
+            });
+            services.AddSingleton<IGarminClientFactory>(sp =>
+                new GarminClientFactory(sp.GetRequiredService<ILogger<GarminSession>>()));
+            services.AddSingleton<IGarminSession>(sp => new GarminSession(
+                sp.GetRequiredService<ISettingsStore>(),
+                sp.GetRequiredService<IGarminClientFactory>(),
+                sp.GetRequiredService<ILogger<GarminSession>>()));
+            services.AddSingleton<IActivityUploader>(sp => new GarminActivityUploader(
+                sp.GetRequiredService<IGarminSession>(),
+                sp.GetRequiredService<ILogger<GarminActivityUploader>>()));
+            services.AddSingleton<IFolderWatcher>(sp =>
+                new FileSystemFolderWatcher(sp.GetRequiredService<ILogger<ActivityDiscovery>>()));
+            services.AddSingleton(sp => new FileReadinessWaiter(
+                sp.GetRequiredService<IFileSystemProbe>(),
+                sp.GetRequiredService<ILogger<ActivityPipeline>>()));
+            services.AddSingleton(sp => new ActivityPipeline(
+                sp.GetRequiredService<ISettingsStore>(),
+                sp.GetRequiredService<IProcessedActivityRecord>(),
+                sp.GetRequiredService<IActivityUploader>(),
+                // Empty until fit-device-emulation supplies a member.
+                sp.GetServices<IActivityTransformation>(),
+                sp.GetRequiredService<IFileSystemProbe>(),
+                sp.GetRequiredService<FileReadinessWaiter>(),
+                sp.GetRequiredService<IActivityFileStore>(),
+                sp.GetRequiredService<ILogger<ActivityPipeline>>()));
+            services.AddSingleton(sp => new ActivityDiscovery(
+                sp.GetRequiredService<ISettingsStore>(),
+                sp.GetRequiredService<IProcessedActivityRecord>(),
+                sp.GetRequiredService<IActivityFileStore>(),
+                sp.GetRequiredService<IFolderWatcher>(),
+                sp.GetRequiredService<ActivityPipeline>(),
+                sp.GetRequiredService<ILogger<ActivityDiscovery>>()));
 
             // Platform implementations of the core abstractions. All three are
             // replaced by avalonia-ui-port.

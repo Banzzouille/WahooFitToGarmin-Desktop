@@ -1,23 +1,32 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 
 using ControlzEx.Theming;
 
 using MahApps.Metro.Theming;
 
 using WahooFitToGarmin_Desktop.Contracts.Services;
+using WahooFitToGarmin_Desktop.Core.Settings;
 using WahooFitToGarmin_Desktop.Models;
 
 namespace WahooFitToGarmin_Desktop.Services
 {
+    /// <summary>
+    /// Applies and remembers the chosen theme.
+    /// </summary>
+    /// <remarks>
+    /// The choice is stored in the settings store like every other user setting.
+    /// It used to live in the application's property bag, which was persisted by
+    /// a service that no longer exists — leaving it there would have meant the
+    /// theme silently stopped surviving a restart.
+    /// </remarks>
     public class ThemeSelectorService : IThemeSelectorService
     {
         private const string HcDarkTheme = "pack://application:,,,/Styles/Themes/HC.Dark.Blue.xaml";
         private const string HcLightTheme = "pack://application:,,,/Styles/Themes/HC.Light.Blue.xaml";
 
-        public ThemeSelectorService()
-        {
-        }
+        private readonly ISettingsStore _settingsStore;
+
+        public ThemeSelectorService(ISettingsStore settingsStore) => _settingsStore = settingsStore;
 
         public void InitializeTheme()
         {
@@ -27,8 +36,7 @@ namespace WahooFitToGarmin_Desktop.Services
             ThemeManager.Current.AddLibraryTheme(new LibraryTheme(new Uri(HcDarkTheme), MahAppsLibraryThemeProvider.DefaultInstance));
             ThemeManager.Current.AddLibraryTheme(new LibraryTheme(new Uri(HcLightTheme), MahAppsLibraryThemeProvider.DefaultInstance));
 
-            var theme = GetCurrentTheme();
-            SetTheme(theme);
+            SetTheme(GetCurrentTheme());
         }
 
         public void SetTheme(AppTheme theme)
@@ -45,19 +53,12 @@ namespace WahooFitToGarmin_Desktop.Services
                 ThemeManager.Current.ChangeTheme(Application.Current, $"{theme}.Blue", SystemParameters.HighContrast);
             }
 
-            App.Current.Properties["Theme"] = theme.ToString();
+            _settingsStore.Update(s => s with { Theme = theme.ToString() });
         }
 
-        public AppTheme GetCurrentTheme()
-        {
-            if (App.Current.Properties.Contains("Theme"))
-            {
-                var themeName = App.Current.Properties["Theme"].ToString();
-                Enum.TryParse(themeName, out AppTheme theme);
-                return theme;
-            }
-
-            return AppTheme.Default;
-        }
+        public AppTheme GetCurrentTheme() =>
+            Enum.TryParse<AppTheme>(_settingsStore.Current.Theme, out var theme)
+                ? theme
+                : AppTheme.Default;
     }
 }

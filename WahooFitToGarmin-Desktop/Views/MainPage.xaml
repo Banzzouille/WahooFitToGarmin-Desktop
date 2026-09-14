@@ -65,8 +65,13 @@
             Place your content here.
             -->
             <DockPanel>
-                <TextBlock Text="{Binding Count, StringFormat='{}{0} Items'}"
-                           DockPanel.Dock="Top"/>
+                <!-- Replaces a binding to a Count property no view model had,
+                     so the line rendered as an empty " Items" for ever. -->
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0,0,0,4">
+                    <TextBlock Text="{Binding Processed, StringFormat='{}Uploaded: {0}'}" />
+                    <TextBlock Text="{Binding Duplicates, StringFormat='{}Already present: {0}'}" Margin="16,0,0,0" />
+                    <TextBlock Text="{Binding Failed, StringFormat='{}Failed: {0}'}" Margin="16,0,0,0" />
+                </StackPanel>
 
                 <ItemsControl ItemsSource="{Binding LogEntries}" Style="{StaticResource LogViewerStyle}">
                 </ItemsControl>
