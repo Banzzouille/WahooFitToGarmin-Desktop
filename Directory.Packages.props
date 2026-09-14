@@ -5,6 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup Label="Core">
+    <!-- The official FIT SDK. Targets netstandard2.0 and has no dependencies of
+         its own, so it is consumable from the platform-neutral core library. -->
+    <PackageVersion Include="Garmin.FIT.Sdk" Version="21.214.0" />
     <PackageVersion Include="Flurl.Http" Version="4.0.2" />
     <PackageVersion Include="OAuth.DotNetCore" Version="3.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />

@@ -1,14 +1,14 @@
 ## 1. Preconditions and sample material
 
-- [ ] 1.1 Confirm `extract-platform-agnostic-core` is merged, so the transformation step exists in the pipeline
-- [ ] 1.2 Create branch `feat/fit-device-emulation`
+- [x] 1.1 Confirm `extract-platform-agnostic-core` is merged, so the transformation step exists in the pipeline
+- [x] 1.2 Create branch `feat/fit-device-emulation`
 - [ ] 1.3 Collect real Wahoo exports as test fixtures: at least one ride with paired sensors, one without, and one long enough to span multiple laps
 - [ ] 1.4 Collect a FIT file that is not an activity, to exercise the pass-through path
 - [ ] 1.5 Record the user's Garmin device model and Unit ID for the end-to-end verification
 
 ## 2. Round-trip fidelity (gate)
 
-- [ ] 2.1 Add the FIT software development kit to the core library
+- [x] 2.1 Add the FIT software development kit to the core library
 - [ ] 2.2 Implement decode of an activity into its messages
 - [ ] 2.3 Implement re-encode of those messages back to bytes
 - [ ] 2.4 Write the round-trip test first: decode a real Wahoo export, re-encode with no modification, decode the result, and compare message inventory and field values
@@ -19,11 +19,11 @@
 
 ## 3. Device catalogue
 
-- [ ] 3.1 Implement the catalogue as data: display name, product identifier, software version, hardware version, device kind
-- [ ] 3.2 Reference the software development kit's product enumeration by name; transcribe no numeric literal
-- [ ] 3.3 Populate the initial rows: Fenix 7, Fenix 7S, Fenix 7X, Fenix 7 Pro Solar, Fenix 8, Forerunner 965, Edge 1040, Edge 1050
-- [ ] 3.4 Record in a comment that the version values are cosmetic, so nobody later invests in tracking firmware releases
-- [ ] 3.5 Test: every catalogue row resolves to a product identifier
+- [x] 3.1 Implement the catalogue as data: display name, product identifier, software version, hardware version, device kind
+- [x] 3.2 Reference the software development kit's product enumeration by name; transcribe no numeric literal
+- [x] 3.3 Populate the initial rows: Fenix 7, Fenix 7S, Fenix 7X, Fenix 7 Pro Solar, Fenix 8, Forerunner 965, Edge 1040, Edge 1050
+- [x] 3.4 Record in a comment that the version values are cosmetic, so nobody later invests in tracking firmware releases
+- [x] 3.5 Test: every catalogue row resolves to a product identifier
 
 ## 4. Identity patching
 

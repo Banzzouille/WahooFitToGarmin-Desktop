@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="Flurl.Http" />
+    <PackageReference Include="Garmin.FIT.Sdk" />
     <PackageReference Include="OAuth.DotNetCore" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <!-- Abstractions only: the core library defines a hosted service but
