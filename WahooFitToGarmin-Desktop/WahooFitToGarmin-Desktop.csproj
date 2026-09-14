@@ -38,6 +38,8 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting" />
 		<PackageReference Include="CommunityToolkit.Mvvm" />
 		<PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" />
+		<PackageReference Include="Serilog.Extensions.Hosting" />
+		<PackageReference Include="Serilog.Sinks.File" />
 	</ItemGroup>
 
 	<ItemGroup>

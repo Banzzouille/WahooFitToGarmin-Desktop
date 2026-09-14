@@ -6,6 +6,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using Flurl.Http;
+
+using Microsoft.Extensions.Logging;
 using Flurl.Util;
 using OAuth;
 using WahooFitToGarmin_Desktop.Core.GARMIN.Dto;
@@ -29,6 +31,7 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
             catch (FlurlHttpException ex)
             {
                 _authStatus = AuthStatus.InitCookiesError;
+                _logger.LogError(ex, "Garmin authentication failed at {AuthStatus}", _authStatus);
                 throw new GarminClientException(_authStatus, ex.Message, ex);
             }
 
@@ -82,14 +85,17 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
                 if (responseContent == "error code: 1020")
                 {
                     _authStatus = AuthStatus.AuthBlockedByCloudFlare;
+                    _logger.LogError(ex, "Garmin authentication failed at {AuthStatus}", _authStatus);
                     throw new GarminClientException(_authStatus, ex.Message, ex);
                 }
                 _authStatus = AuthStatus.AuthenticationFailed;
+                _logger.LogError(ex, "Garmin authentication failed at {AuthStatus}", _authStatus);
                 throw new GarminClientException(_authStatus, ex.Message, ex);
             }
             catch (FlurlHttpException ex)
             {
                 _authStatus = AuthStatus.AuthenticationFailedCheckCredencials;
+                _logger.LogError(ex, "Garmin authentication failed at {AuthStatus}", _authStatus);
                 throw new GarminClientException(_authStatus, ex.Message, ex);
             }
 

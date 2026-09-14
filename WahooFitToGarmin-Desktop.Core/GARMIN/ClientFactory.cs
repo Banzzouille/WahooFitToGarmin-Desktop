@@ -1,34 +1,37 @@
-﻿using System;
-using System.Threading.Tasks;
 using Flurl.Http;
+
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+
 using WahooFitToGarmin_Desktop.Core.GARMIN.Dto;
 
 namespace WahooFitToGarmin_Desktop.Core.GARMIN
 {
     public class ClientFactory
     {
-
-        public static IClient Create(string consumerKey, string consumerSecret)
+        public static IClient Create(string consumerKey, string consumerSecret, ILogger? logger = null)
         {
-            var client = new Client(consumerKey, consumerSecret);
-            return client;
+            return new Client(consumerKey, consumerSecret, logger ?? NullLogger.Instance);
         }
 
-        public static async Task<IClient> Create()
+        public static async Task<IClient> Create(ILogger? logger = null)
         {
+            logger ??= NullLogger.Instance;
+
             var keys = await URLs.GARMIN_API_CONSUMER_KEYS
                             .GetAsync()
                             .ReceiveJson<GarminApiConsumerKeys>();
 
             if (keys?.ConsumerKey is null || keys.ConsumerSecret is null)
             {
-                throw new Exception($"Could not parse consumer keys from url: {URLs.GARMIN_API_CONSUMER_KEYS}");
-                
-            }
-            var client = Create(keys.ConsumerKey, keys.ConsumerSecret);
-            return client;
-        }
+                logger.LogError(
+                    "Could not parse consumer keys from url: {Url}",
+                    URLs.GARMIN_API_CONSUMER_KEYS);
 
-       
+                throw new Exception($"Could not parse consumer keys from url: {URLs.GARMIN_API_CONSUMER_KEYS}");
+            }
+
+            return Create(keys.ConsumerKey, keys.ConsumerSecret, logger);
+        }
     }
 }

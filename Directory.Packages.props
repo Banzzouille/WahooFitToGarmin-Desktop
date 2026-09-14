@@ -13,11 +13,6 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
   </ItemGroup>
 
-  <ItemGroup Label="Being removed during this change">
-    <!-- Replaced by System.Text.Json in task group 8. -->
-    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-  </ItemGroup>
-
   <ItemGroup Label="Desktop">
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.12" />

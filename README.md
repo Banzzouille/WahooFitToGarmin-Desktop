@@ -14,7 +14,7 @@ I didn't want to continue to synchronize manually each time i do an activity bet
 
 - I use auto export functionality to DropBox directly from Wahoo compagnon app
 - Install the Dropbox client on your computer
-- Install .NET Core 3.1 Desktop Runtime from here [.NET Desktop Runtime 3.1.23](https://dotnet.microsoft.com/en-us/download/dotnet/3.1)
+- Install the .NET 10 Desktop Runtime from here [.NET Desktop Runtime 10](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
 - Download and Unzip the app on your computer
 
 # Step by step Guide
@@ -54,6 +54,14 @@ File will be discovered when new file appears in the DropBox folder you have sel
 To have an autostart app (starting with Windows) you can add a shortcut of the exe file in this folder : C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup  
 
 Your data will be stored here : C:\Users\%username%\AppData\Local\WahooFitToGarmin_Desktop
+
+Your settings live in the `Configurations` folder there, and the application log
+in the `Logs` folder beside it. Log files roll every day, and again once a file
+reaches 10 MB; the seven most recent are kept and older ones are removed.
+
+Earlier versions wrote a `WahooFitToGarmin-Desktop.log` file next to the
+executable, in whatever folder the application happened to start from. That file
+is no longer written and can be deleted.
 
 
          

@@ -25,7 +25,7 @@
 - [x] 2b.2 Verify the whole solution builds from the `.slnx`
 - [x] 2b.3 Verify `dotnet test` runs from the `.slnx`
 - [x] 2b.4 Delete the legacy `.sln`
-- [ ] 2b.5 Confirm the `.slnx` opens in the editors the project's contributors use, since tooling support for the format is newer than the format itself
+- [x] 2b.5 Confirm the `.slnx` opens in the editors the project's contributors use, since tooling support for the format is newer than the format itself
 
 ## 3. Core library retarget
 
@@ -64,49 +64,49 @@
 
 ## 7. Logging pipeline
 
-- [ ] 7.1 Add Serilog with the hosting integration to the desktop project only; Core must not reference it
-- [ ] 7.2 Configure the rolling file sink: daily interval, 10 MB per-file limit with roll on size, 7 retained files, written under the local application data `Logs` folder
-- [ ] 7.3 Create the `Logs` directory at startup if it is absent
-- [ ] 7.4 Configure the output template so each line carries its severity level
-- [ ] 7.5 Implement an `ILoggerProvider` that marshals formatted entries onto the UI dispatcher and appends them to the observable collection backing the log viewer
-- [ ] 7.6 Bound that collection, trimming oldest entries past the cap
-- [ ] 7.7 Reduce `Helpers/LogEntry.cs` to a plain DTO; remove the `File.AppendText` call from its constructor
-- [ ] 7.8 Confirm `MainPage.xaml` requires no edit, since `LogDateTime` and `LogMessage` are unchanged
-- [ ] 7.9 Replace `MainViewModel.Log()` calls with `ILogger<MainViewModel>` calls, preserving the exact message wording captured in 1.2
-- [ ] 7.10 Inject `ILogger<T>` into Core's Garmin client and log upload and authentication failures
-- [ ] 7.11 Implement `App.OnDispatcherUnhandledException` to log exception type, message, and stack trace
-- [ ] 7.12 Verify the file sink failing does not crash the app, by pointing it at a read-only path once
+- [x] 7.1 Add Serilog with the hosting integration to the desktop project only; Core must not reference it
+- [x] 7.2 Configure the rolling file sink: daily interval, 10 MB per-file limit with roll on size, 7 retained files, written under the local application data `Logs` folder
+- [x] 7.3 Create the `Logs` directory at startup if it is absent
+- [x] 7.4 Configure the output template so each line carries its severity level
+- [x] 7.5 Implement an `ILoggerProvider` that marshals formatted entries onto the UI dispatcher and appends them to the observable collection backing the log viewer
+- [x] 7.6 Bound that collection, trimming oldest entries past the cap
+- [x] 7.7 Reduce `Helpers/LogEntry.cs` to a plain DTO; remove the `File.AppendText` call from its constructor
+- [x] 7.8 Confirm `MainPage.xaml` requires no edit, since `LogDateTime` and `LogMessage` are unchanged
+- [x] 7.9 Replace `MainViewModel.Log()` calls with `ILogger<MainViewModel>` calls, preserving the exact message wording captured in 1.2
+- [x] 7.10 Inject `ILogger<T>` into Core's Garmin client and log upload and authentication failures
+- [x] 7.11 Implement `App.OnDispatcherUnhandledException` to log exception type, message, and stack trace
+- [ ] 7.12 Verify the file sink failing does not crash the app, by pointing it at a read-only path once. The guard is in place — preparing the log directory is wrapped, and a failure is reported through Serilog's diagnostic channel then dropped — but confirming it needs the application running, so this belongs with the Windows verification set
 
 ## 8. Settings serialization
 
-- [ ] 8.1 Replace `Newtonsoft.Json` with `System.Text.Json` in `Core/Services/FileService.cs`
-- [ ] 8.2 Keep the base64 envelope on write and keep the leading-brace sniffing on read
-- [ ] 8.3 Project `App.Current.Properties` to `Dictionary<string, string>` before saving in `PersistAndRestoreService`, and rehydrate on restore
-- [ ] 8.4 Remove the `Newtonsoft.Json` package reference from Core
-- [ ] 8.5 Normalise the backslash in `appsettings.json` `configurationsFolder` to a platform-neutral separator
-- [ ] 8.6 Test: round-trip of all five stored keys returns identical values
-- [ ] 8.7 Test: a base64-wrapped settings file produced by version 1.1.0 is restored correctly
-- [ ] 8.8 Test: a plain JSON settings file is restored correctly
-- [ ] 8.9 Test: non-generic dictionary content is not lost through serialization
+- [x] 8.1 Replace `Newtonsoft.Json` with `System.Text.Json` in `Core/Services/FileService.cs`
+- [x] 8.2 Keep the base64 envelope on write and keep the leading-brace sniffing on read
+- [x] 8.3 Project `App.Current.Properties` to `Dictionary<string, string>` before saving in `PersistAndRestoreService`, and rehydrate on restore
+- [x] 8.4 Remove the `Newtonsoft.Json` package reference from Core
+- [x] 8.5 Normalise the backslash in `appsettings.json` `configurationsFolder` to a platform-neutral separator
+- [x] 8.6 Test: round-trip of all five stored keys returns identical values
+- [x] 8.7 Test: a base64-wrapped settings file produced by version 1.1.0 is restored correctly
+- [x] 8.8 Test: a plain JSON settings file is restored correctly
+- [x] 8.9 Test: non-generic dictionary content is not lost through serialization
 - [ ] 8.10 Manual check: launch with a settings file from the previous version and confirm every setting is still populated
 
 ## 9. Diagnostics fixes
 
-- [ ] 9.1 Replace both `throw ex;` occurrences in `Core/GARMIN/Client.cs` with `throw;`
-- [ ] 9.2 Search the solution for any other stack-trace-resetting rethrow
-- [ ] 9.3 Rewrite `ApplicationInfoService.GetVersion()` to read `AssemblyInformationalVersionAttribute` instead of `Assembly.Location` and `FileVersionInfo`
+- [x] 9.1 Replace both `throw ex;` occurrences in `Core/GARMIN/Client.cs` with `throw;`
+- [x] 9.2 Search the solution for any other stack-trace-resetting rethrow
+- [x] 9.3 Rewrite `ApplicationInfoService.GetVersion()` to read `AssemblyInformationalVersionAttribute` instead of `Assembly.Location` and `FileVersionInfo`
 - [ ] 9.4 Confirm the settings page still displays a non-empty version
 
 ## 10. Documentation
 
-- [ ] 10.1 Update the README prerequisite from .NET Core 3.1 Desktop Runtime to .NET 10 Desktop Runtime, replacing the download link
-- [ ] 10.2 Document the new log file location in the README
-- [ ] 10.3 Note that the previous `WahooFitToGarmin-Desktop.log` in the working directory is no longer written and can be deleted
+- [x] 10.1 Update the README prerequisite from .NET Core 3.1 Desktop Runtime to .NET 10 Desktop Runtime, replacing the download link
+- [x] 10.2 Document the new log file location in the README
+- [x] 10.3 Note that the previous `WahooFitToGarmin-Desktop.log` in the working directory is no longer written and can be deleted
 
 ## 11. Verification
 
-- [ ] 11.1 `dotnet build` succeeds for the whole solution
-- [ ] 11.2 `dotnet test` passes
+- [x] 11.1 `dotnet build` succeeds for the whole solution
+- [x] 11.2 `dotnet test` passes
 - [ ] 11.3 Smoke: settings load from an existing installation
 - [ ] 11.4 Smoke: folder selection dialog opens and persists the chosen path
 - [ ] 11.5 Smoke: all three themes apply
@@ -115,4 +115,4 @@
 - [ ] 11.8 Smoke: compare emitted log messages against the 1.2 baseline — same messages, same order
 - [ ] 11.9 Confirm a log file exists under local application data and none in the working directory
 - [ ] 11.10 Confirm an error logged from Core appears in the in-app log viewer
-- [ ] 11.11 Review the nullable warning count; Core must be clean, desktop warnings are recorded as follow-up work
+- [x] 11.11 Review the nullable warning count; Core must be clean, desktop warnings are recorded as follow-up work — Core is at zero, the desktop project carries 208, recorded in `nullable-debt.md` and burned down as its files are rewritten by later changes

@@ -9,7 +9,10 @@ using System.Windows.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Uwp.Notifications;
+
+using Serilog;
 
 using WahooFitToGarmin_Desktop.Activation;
 using WahooFitToGarmin_Desktop.Contracts.Activation;
@@ -19,6 +22,7 @@ using WahooFitToGarmin_Desktop.Core.Contracts.Services;
 using WahooFitToGarmin_Desktop.Core.Services;
 using WahooFitToGarmin_Desktop.Models;
 using WahooFitToGarmin_Desktop.Services;
+using WahooFitToGarmin_Desktop.Services.Logging;
 using WahooFitToGarmin_Desktop.ViewModels;
 using WahooFitToGarmin_Desktop.Views;
 
@@ -68,6 +72,13 @@ namespace WahooFitToGarmin_Desktop
                         c.SetBasePath(appLocation);
                         c.AddInMemoryCollection(activationArgs);
                     })
+                    // writeToProviders keeps the other registered providers alive,
+                    // so the same entries reach both the rolling file and the
+                    // in-app viewer. See design.md, D4.
+                    .UseSerilog(
+                        (context, loggerConfiguration) =>
+                            FileLoggingSetup.Configure(loggerConfiguration, context.Configuration),
+                        writeToProviders: true)
                     .ConfigureServices(ConfigureServices)
                     .Build();
 
@@ -89,6 +100,11 @@ namespace WahooFitToGarmin_Desktop
 
             // Activation Handlers
             services.AddSingleton<IActivationHandler, ToastNotificationActivationHandler>();
+
+            // Logging: one pipeline, two sinks. The rolling file is configured
+            // by Serilog; the in-app viewer is fed by a logger provider.
+            services.AddSingleton<ILogStore, InAppLogStore>();
+            services.AddSingleton<ILoggerProvider, InAppLoggerProvider>();
 
             // Core Services
             services.AddSingleton<IFileService, FileService>();
@@ -125,8 +141,26 @@ namespace WahooFitToGarmin_Desktop
 
         private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            // TODO WTS: Please log and handle the exception as appropriate to your scenario
-            // For more info see https://docs.microsoft.com/dotnet/api/system.windows.application.dispatcherunhandledexception?view=netcore-3.0
+            // This handler used to be empty, so a crash left no trace anywhere.
+            // The type, message and stack trace go to the log file; the viewer
+            // shows the type and message.
+            var logger = _host?.Services.GetService<ILogger<App>>();
+
+            if (logger is not null)
+            {
+                logger.LogCritical(
+                    e.Exception,
+                    "Unhandled exception on the dispatcher thread: {ExceptionType}",
+                    e.Exception.GetType().FullName);
+            }
+            else
+            {
+                // Too early for the host, so go straight to Serilog's static
+                // logger rather than losing the exception entirely.
+                Log.Fatal(e.Exception, "Unhandled exception before the host was available");
+            }
+
+            Log.CloseAndFlush();
         }
     }
 }

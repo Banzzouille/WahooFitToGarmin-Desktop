@@ -2,6 +2,9 @@
 using System.IO;
 using System.Threading.Tasks;
 using Flurl.Http;
+
+using Microsoft.Extensions.Logging;
+
 using WahooFitToGarmin_Desktop.Core.GARMIN.Dto;
 using WahooFitToGarmin_Desktop.Core.GARMIN.Dto.Garmin;
 
@@ -11,6 +14,7 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
     {
         private readonly string _consumerKey;
         private readonly string _consumerSecret;
+        private readonly ILogger _logger;
         private AuthStatus _authStatus;
         private string _mfaCsrfToken = string.Empty;
         CookieJar? _cookieJar = null;
@@ -30,12 +34,11 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
         public DateTime _oAuth2TokenValidUntil { get; private set; }
 
 
-        internal Client(string consumerKey, string consumerSecret)
+        internal Client(string consumerKey, string consumerSecret, ILogger logger)
         {
-
             _consumerKey = consumerKey;
             _consumerSecret = consumerSecret;
-
+            _logger = logger;
         }
 
         public bool IsOAuthValid
@@ -79,12 +82,21 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
 
             catch (FlurlHttpException ex)
             {
-                throw ex;
+                // `throw ex;` here reset the stack trace to this line, hiding
+                // where the failure actually came from. `throw;` preserves it.
+                _logger.LogError(
+                    ex,
+                    "Garmin upload failed for {FileName} with status {Status}",
+                    fileName,
+                    ex.StatusCode);
+                throw;
             }
             catch (Exception ex)
             {
-                throw ex;
+                _logger.LogError(ex, "Garmin upload failed for {FileName}", fileName);
+                throw;
             }
+
             return response;
         }
 

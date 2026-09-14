@@ -84,11 +84,33 @@ It would be tempting to drop it and write readable JSON. Rejected for sequencing
 
 The existing `{`-sniffing read path is retained, so files written by either serializer load.
 
-### D7 — `IDictionary` is projected to `Dictionary<string, string>` before serialization
+### D7 — Property bag values are normalised to strings, in both directions
 
-This is the one genuine incompatibility in the Newtonsoft → `System.Text.Json` swap. `PersistAndRestoreService` passes `App.Current.Properties`, a non-generic `IDictionary`. Newtonsoft serialises it happily; `System.Text.Json` has no support for non-generic dictionaries and will throw or emit nothing useful.
+This decision was written on a false premise and is corrected here.
 
-`PersistAndRestoreService` therefore projects to `Dictionary<string, string>` on save and rehydrates on restore. All five stored keys (`WahooDropBoxFolder`, `GarminLogin`, `GarminPwd`, `KeepUploadedActivityFile`, `Theme`) are already read back via `.ToString()` and `bool.TryParse`, so string values lose nothing. `App.Current.Properties` disappears entirely in `extract-platform-agnostic-core`.
+The original claim was that `System.Text.Json` has no support for non-generic
+dictionaries, and that handing it `App.Current.Properties` would throw or emit
+nothing useful. That is not true on .NET 10: serialization writes the bag
+correctly, and deserialization into `IDictionary` succeeds, yielding a
+dictionary whose values are `JsonElement`. The test written to prove the
+incompatibility failed, which is how the error surfaced.
+
+The conversion is kept anyway, on narrower grounds. Reading straight into the
+bag leaves `JsonElement` values sitting beside the plain strings and booleans
+the settings page writes at runtime, so the bag's contents depend on whether a
+value came from disk or from the user in this session. Every consumer calls
+`ToString` or `bool.TryParse`, so normalising to strings on the way in and on
+the way out costs nothing and removes that distinction.
+
+`PropertyBagSerialization` therefore projects the bag to
+`Dictionary<string, string>` on save, and flattens each `JsonElement` to its
+string form on restore. The flattening is not cosmetic: version 1.1.0 stored
+the keep-uploaded-file option as an unquoted JSON boolean, so a file written by
+that version cannot be read into a string dictionary directly.
+
+It lives in the core library rather than beside its caller because it is pure,
+it carries the backward-compatibility rule, and a platform-neutral home is the
+only one the tests can reach.
 
 ### D8 — Nullable enabled, warnings not errors
 
