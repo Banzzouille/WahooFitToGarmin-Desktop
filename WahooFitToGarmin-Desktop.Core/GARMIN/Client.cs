@@ -13,7 +13,7 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
         private readonly string _consumerSecret;
         private AuthStatus _authStatus;
         private string _mfaCsrfToken = string.Empty;
-        CookieJar _cookieJar = null;
+        CookieJar? _cookieJar = null;
 
         private static readonly object _commonQueryParams = new
         {
@@ -26,7 +26,7 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
             source = URLs.SSO_EMBED_URL,
         };
 
-        public OAuth2Token OAuth2Token { get; private set; }
+        public OAuth2Token? OAuth2Token { get; private set; }
         public DateTime _oAuth2TokenValidUntil { get; private set; }
 
 
@@ -51,16 +51,16 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
             }
         }
 
-        public async Task<UploadResponse> UploadActivity(string format, byte[] file, string filePath)
+        public async Task<UploadResponse?> UploadActivity(string format, byte[] file, string filePath)
         {
-            UploadResponse response = null;
+            UploadResponse? response = null;
             var fileName = Path.GetFileName(filePath);
             try
             {
                 using (var stream = new MemoryStream(file))
                 {
                     response = await $"{URLs.UPLOAD_URL}/{format}"
-                 .WithOAuthBearerToken(OAuth2Token.Access_Token)
+                 .WithOAuthBearerToken(OAuth2Token!.Access_Token)
                  .WithHeader("NK", "NT")
                  .WithHeader("origin", URLs.ORIGIN)
                  .WithHeader("User-Agent", MagicStrings.USER_AGENT)

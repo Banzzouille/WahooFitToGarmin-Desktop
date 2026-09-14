@@ -1,0 +1,45 @@
+<Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup Label="Shared">
+    <PackageVersion Include="Flurl.Http" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Core">
+    <PackageVersion Include="OAuth.DotNetCore" Version="3.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup Label="Being removed during this change">
+    <!-- Replaced by CommunityToolkit.Mvvm in task group 6. -->
+    <PackageVersion Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
+    <!-- Replaced by System.Text.Json in task group 8. -->
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup Label="Desktop">
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
+    <PackageVersion Include="MahApps.Metro" Version="2.4.9" />
+    <PackageVersion Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.2" />
+    <PackageVersion Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Logging">
+    <PackageVersion Include="Serilog" Version="4.4.0" />
+    <PackageVersion Include="Serilog.Extensions.Hosting" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Tests">
+    <!-- The MSTest meta-package pulls in the framework, the adapter and the
+         analyzers. It runs on Microsoft.Testing.Platform, which the .NET 10 SDK
+         requires now that `dotnet test` no longer supports VSTest. -->
+    <PackageVersion Include="MSTest" Version="4.4.0" />
+    <PackageVersion Include="Moq" Version="4.20.72" />
+  </ItemGroup>
+
+</Project>

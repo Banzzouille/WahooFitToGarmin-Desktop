@@ -70,7 +70,7 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
                 _csrf = csrfToken
             };
 
-            SendCredentialsResult sendCredentialsResult = null;
+            SendCredentialsResult? sendCredentialsResult = null;
             try
             {
                 sendCredentialsResult = await this.SendCredentialsAsync(csrfRequest, sendCredentialsRequest);
@@ -82,7 +82,6 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
                 if (responseContent == "error code: 1020")
                 {
                     _authStatus = AuthStatus.AuthBlockedByCloudFlare;
-                    var errorMessage = "Garmin Authentication Failed. Blocked by CloudFlare.";
                     throw new GarminClientException(_authStatus, ex.Message, ex);
                 }
                 _authStatus = AuthStatus.AuthenticationFailed;
@@ -94,14 +93,15 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
                 throw new GarminClientException(_authStatus, ex.Message, ex);
             }
 
-            if (sendCredentialsResult.WasRedirected && sendCredentialsResult.RedirectedTo.Contains(URLs.SSO_ENTER_MFA_URL))
+            if (sendCredentialsResult is { WasRedirected: true, RedirectedTo: not null }
+                && sendCredentialsResult.RedirectedTo.Contains(URLs.SSO_ENTER_MFA_URL))
             {
                 result.MFACodeRequested = true;
 
                 _authStatus = AuthStatus.MFARedirected;
                 try
                 {
-                    var mfaCsrfToken = FindCsrfToken(sendCredentialsResult.RawResponseBody);
+                    var mfaCsrfToken = FindCsrfToken(sendCredentialsResult.RawResponseBody ?? string.Empty);
                     _mfaCsrfToken = mfaCsrfToken;
                     return result;
 
@@ -115,7 +115,7 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
 
             }
 
-            var loginResult = sendCredentialsResult?.RawResponseBody;
+            var loginResult = sendCredentialsResult?.RawResponseBody ?? string.Empty;
 
             return await FinishAuthenticate(loginResult);
 
@@ -200,7 +200,6 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
                 if (responseContent == "error code: 1020")
                 {
                     _authStatus = AuthStatus.MFAAuthBlockedByCloudFlare;
-                    var errorMessage = "MFA: Garmin Authentication Failed. Blocked by CloudFlare.";
                     throw new GarminClientException(_authStatus, ex.Message, ex);
                 }
                 _authStatus = AuthStatus.InvalidMFACode;
@@ -228,7 +227,7 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
             var result = await CookieExtensions.WithCookies(URLs.SSO_SIGNIN_URL
                             .WithHeader("User-Agent", MagicStrings.USER_AGENT)
                             .WithHeader("origin", URLs.ORIGIN)
-                            .SetQueryParams(queryParams), (CookieJar)_cookieJar)
+                            .SetQueryParams(queryParams), _cookieJar!)
                         .GetAsync()
                         .ReceiveString();
 
@@ -242,7 +241,7 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
                             .WithHeader("origin", URLs.ORIGIN)
                             .WithHeader("referer", URLs.REFERER)
                             .WithHeader("NK", "NT")
-                            .SetQueryParams(queryParams), (CookieJar)_cookieJar)
+                            .SetQueryParams(queryParams), _cookieJar!)
                         .OnRedirect((r) => { result.WasRedirected = true; result.RedirectedTo = r.Redirect.Url; })
                         .PostUrlEncodedAsync(loginData)
                         .ReceiveString();
@@ -255,8 +254,8 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
             return CookieExtensions.WithCookies("https://sso.garmin.com/sso/verifyMFA/loginEnterMfaCode"
                             .WithHeader("User-Agent", MagicStrings.USER_AGENT)
                             .WithHeader("origin", URLs.ORIGIN)
-                            .SetQueryParams(Client._commonQueryParams), (CookieJar)_cookieJar)
-                        .OnRedirect(redir => CookieExtensions.WithCookies(redir.Request, (CookieJar)_cookieJar))
+                            .SetQueryParams(Client._commonQueryParams), _cookieJar!)
+                        .OnRedirect(redir => CookieExtensions.WithCookies(redir.Request, _cookieJar!))
                         .PostUrlEncodedAsync(mfaData)
                         .ReceiveString();
         }

@@ -100,7 +100,9 @@ Policy: enabled everywhere, `TreatWarningsAsErrors` off. Core is annotated prope
 
 It resolves the version through `Assembly.GetExecutingAssembly().Location` + `FileVersionInfo`. `Location` returns an empty string under single-file publish, which `cross-platform-packaging-ci` will use, so this throws at that point. It is a three-line fix to read `AssemblyInformationalVersionAttribute` instead; doing it now avoids a confusing failure in a change that has nothing to do with versioning.
 
-### D10 — Test scope
+### D10 — Test scope and framework
+
+The test project uses MSTest with Moq, and runs on Microsoft.Testing.Platform: the .NET 10 SDK no longer supports VSTest from `dotnet test`, so the repository opts into the new runner through `global.json`. No test SDK package and no VSTest adapter are needed.
 
 The test project references Core only; the UI project's Windows TFM would make the tests unrunnable on the macOS CI leg introduced later.
 
@@ -142,7 +144,23 @@ No data migration. Existing settings files load unchanged.
 
 ## Open Questions
 
-- Which `MahApps.Metro` version builds cleanly against `net10.0-windows`? Resolved during step 4 by trying the current release.
-- Does `Microsoft.Toolkit.Uwp.Notifications` 7.1.2 resolve on the Windows SDK TFM, or is `CommunityToolkit.WinUI.Notifications` required? Resolved during step 4.
-- Is `net10.0-windows10.0.19041.0` sufficient for the WinRT notification projections, or is a higher SDK version needed? Resolved during step 4.
-- Should the retained-log-count and size-cap values be configurable in `appsettings.json` or fixed constants? Leaning fixed, since no one will tune them; to be settled when writing the `application-logging` spec.
+Resolved during the compatibility spike, ahead of implementation:
+
+- **Which `MahApps.Metro` version builds cleanly against `net10.0-windows`?** The version already referenced, 2.4.9, builds without complaint. No bump is needed, which removes the theming-regression risk entirely.
+- **Does `Microsoft.Toolkit.Uwp.Notifications` 7.1.2 resolve on the Windows SDK target framework?** Yes. `CommunityToolkit.WinUI.Notifications` is not required, and the toast code needs no import changes.
+- **Is `net10.0-windows10.0.19041.0` sufficient for the WinRT notification projections?** Yes. `Windows.UI.Notifications` and `Windows.Data.Xml.Dom` both resolve at that version, so the supported-OS floor stays where D1 put it.
+- **Do `Flurl.Http` 4.0.0 and `OAuth.DotNetCore` 3.0.1 run on .NET 10?** Yes. Flurl performed a real HTTPS request and the OAuth1 helper produced a signed authorization header, both on .NET 10.0.11.
+
+Still open:
+
+- Should the retained-log-count and size-cap values be configurable in `appsettings.json` or fixed constants? Leaning fixed, since no one will tune them; the `application-logging` spec fixes them as constants.
+
+## Addendum — D13: Windows targets are built from macOS with `EnableWindowsTargeting`
+
+The spike established something the original design assumed impossible: a project targeting `net10.0-windows10.0.19041.0` with WPF and Windows Forms enabled **compiles on macOS**, provided `EnableWindowsTargeting` is set. MahApps, the UWP notification package, and the WinRT projections all resolve there too.
+
+This property is therefore set in `Directory.Build.props`, so that the whole solution builds on either operating system. It is harmless on Windows and costs nothing.
+
+What it does **not** give is the ability to run the application: WPF executes only on Windows. So compilation, package resolution, and the automated tests are all available here, while anything requiring the application to start — the behaviour baseline and the smoke checklist — still needs a Windows machine.
+
+The practical consequence is that the change splits cleanly: everything except the runtime verification can be done and reviewed from macOS.

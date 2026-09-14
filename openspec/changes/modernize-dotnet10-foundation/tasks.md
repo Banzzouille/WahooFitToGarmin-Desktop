@@ -1,37 +1,39 @@
 ## 1. Compatibility spike (gate)
 
-- [ ] 1.1 Create branch `chore/net10-foundation`
-- [ ] 1.2 Record the current behaviour baseline: launch the existing app, capture the exact log messages emitted during startup, file detection, Garmin connection, and upload, for later comparison
-- [ ] 1.3 In a throwaway `net10.0` console project, verify `Flurl.Http` 4.0.0 loads and performs a real HTTPS GET
-- [ ] 1.4 In the same spike, verify `OAuth.DotNetCore` 3.0.1 loads and produces an OAuth1 authorization header
-- [ ] 1.5 Verify `MahApps.Metro` resolves against a `net10.0-windows10.0.19041.0` project; record the working version
-- [ ] 1.6 Verify `Microsoft.Toolkit.Uwp.Notifications` 7.1.2 resolves on the same target; if it does not, confirm `CommunityToolkit.WinUI.Notifications` as the replacement and record which is used
-- [ ] 1.7 Confirm `Windows.UI.Notifications` and `Windows.Data.Xml.Dom` projections resolve at `net10.0-windows10.0.19041.0`; raise the SDK version only if they do not
-- [ ] 1.8 STOP AND RE-PLAN if 1.3 or 1.4 fails — the Garmin client cannot run on .NET 10 without a replacement
-- [ ] 1.9 Delete the spike project
+- [x] 1.1 Create branch `chore/net10-foundation`
+- [x] 1.2 Record the current behaviour baseline in `baseline-log-messages.md`, covering startup, file detection, Garmin connection, and upload. Captured by static extraction from `MainViewModel` at commit `676f35a` rather than by launching the application, because WPF runs only on Windows and this change was implemented on macOS. Message wording is exact; runtime ordering is inferred from the call sites
+- [ ] 1.2a On a Windows machine, run version 1.1.0 through a full cycle and confirm the emitted order matches the ordering stated in `baseline-log-messages.md`; correct the file if it does not. Required before merge, since tasks 6.11 and 11.8 compare against it
+- [x] 1.3 In a throwaway `net10.0` console project, verify `Flurl.Http` 4.0.0 loads and performs a real HTTPS GET
+- [x] 1.4 In the same spike, verify `OAuth.DotNetCore` 3.0.1 loads and produces an OAuth1 authorization header
+- [x] 1.5 Verify `MahApps.Metro` resolves against a `net10.0-windows10.0.19041.0` project; record the working version
+- [x] 1.6 Verify `Microsoft.Toolkit.Uwp.Notifications` 7.1.2 resolves on the same target; if it does not, confirm `CommunityToolkit.WinUI.Notifications` as the replacement and record which is used
+- [x] 1.7 Confirm `Windows.UI.Notifications` and `Windows.Data.Xml.Dom` projections resolve at `net10.0-windows10.0.19041.0`; raise the SDK version only if they do not
+- [x] 1.8 STOP AND RE-PLAN if 1.3 or 1.4 fails — the Garmin client cannot run on .NET 10 without a replacement
+- [x] 1.9 Delete the spike project
 
 ## 2. Build infrastructure
 
-- [ ] 2.1 Add `Directory.Build.props` at the repository root declaring `Nullable`, `ImplicitUsings`, and `LangVersion`
-- [ ] 2.2 Confirm `TreatWarningsAsErrors` is not enabled
-- [ ] 2.3 Add `Directory.Packages.props` with `ManagePackageVersionsCentrally` enabled and a `PackageVersion` entry for every package currently referenced, using the versions confirmed in group 1
-- [ ] 2.4 Strip the `Version` attribute from every `PackageReference` in both project files
-- [ ] 2.5 Verify the solution restores with centrally managed versions before changing any target framework
+- [x] 2.1 Add `Directory.Build.props` at the repository root declaring `Nullable`, `ImplicitUsings`, and `LangVersion`
+- [x] 2.2 Confirm `TreatWarningsAsErrors` is not enabled
+- [x] 2.3 Add `Directory.Packages.props` with `ManagePackageVersionsCentrally` enabled and a `PackageVersion` entry for every package currently referenced, using the versions confirmed in group 1
+- [x] 2.4 Strip the `Version` attribute from every `PackageReference` in both project files
+- [x] 2.5 Verify the solution restores with centrally managed versions before changing any target framework
 
 ## 3. Core library retarget
 
-- [ ] 3.1 Change `WahooFitToGarmin-Desktop.Core.csproj` target framework from `netstandard2.0` to `net10.0`
-- [ ] 3.2 Remove `Nullable`, `LangVersion`, and `ImplicitUsings` from the project file now that `Directory.Build.props` supplies them
-- [ ] 3.3 Build Core and resolve compilation errors introduced by the retarget
-- [ ] 3.4 Annotate Core for nullable reference types until it compiles without nullable warnings
-- [ ] 3.5 Confirm Core references no WPF, Windows Forms, or Windows SDK projection assembly
+- [x] 3.1 Change `WahooFitToGarmin-Desktop.Core.csproj` target framework from `netstandard2.0` to `net10.0`
+- [x] 3.2 Remove `Nullable`, `LangVersion`, and `ImplicitUsings` from the project file now that `Directory.Build.props` supplies them
+- [x] 3.3 Build Core and resolve compilation errors introduced by the retarget
+- [x] 3.4 Annotate Core for nullable reference types until it compiles without nullable warnings
+- [x] 3.5 Confirm Core references no WPF, Windows Forms, or Windows SDK projection assembly
 
 ## 4. Test project
 
-- [ ] 4.1 Create `WahooFitToGarmin.Tests` targeting `net10.0` with xUnit
-- [ ] 4.2 Reference the Core project only; do not reference the desktop project
-- [ ] 4.3 Add the test project to `WahooFitToGarmin-Desktop.sln`
-- [ ] 4.4 Add a placeholder test and confirm `dotnet test` discovers and runs it
+- [x] 4.1 Create `WahooFitToGarmin.Tests` targeting `net10.0` with MSTest and Moq
+- [x] 4.2 Reference the Core project only; do not reference the desktop project
+- [x] 4.3 Add the test project to `WahooFitToGarmin-Desktop.sln`
+- [x] 4.4 Add a placeholder test and confirm `dotnet test` discovers and runs it
+- [x] 4.5 Opt the repository into the Microsoft.Testing.Platform runner through `global.json`, since the .NET 10 SDK no longer supports VSTest from `dotnet test`
 
 ## 5. Desktop project retarget
 

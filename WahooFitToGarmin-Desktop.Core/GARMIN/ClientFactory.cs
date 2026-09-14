@@ -20,7 +20,7 @@ namespace WahooFitToGarmin_Desktop.Core.GARMIN
                             .GetAsync()
                             .ReceiveJson<GarminApiConsumerKeys>();
 
-            if(keys == null)
+            if (keys?.ConsumerKey is null || keys.ConsumerSecret is null)
             {
                 throw new Exception($"Could not parse consumer keys from url: {URLs.GARMIN_API_CONSUMER_KEYS}");
                 

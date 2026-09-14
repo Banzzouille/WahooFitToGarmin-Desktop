@@ -2,22 +2,23 @@
 
 namespace WahooFitToGarmin_Desktop.Core.GARMIN.Dto
 {
+    // Populated by deserialization; the service may omit any string member.
     public class OAuth2Token
     {
         [JsonPropertyName("scope")]
-        public string Scope { get; set; }
+        public string? Scope { get; set; }
 
         [JsonPropertyName("jti")]
-        public string Jti { get; set; }
+        public string? Jti { get; set; }
 
         [JsonPropertyName("access_token")]
-        public string Access_Token { get; set; }
+        public string? Access_Token { get; set; }
 
         [JsonPropertyName("token_type")]
-        public string Token_Type { get; set; }
+        public string? Token_Type { get; set; }
 
         [JsonPropertyName("refresh_token")]
-        public string Refresh_Token { get; set; }
+        public string? Refresh_Token { get; set; }
 
         [JsonPropertyName("expires_in")]
         public long Expires_In { get; set; }

@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Platform-neutral on purpose: these tests must run on the macOS leg of
+         CI as well as the Windows one, so this project references the core
+         library only and never the desktop project. -->
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>WahooFitToGarmin.Tests</RootNamespace>
+    <IsPackable>false</IsPackable>
+
+    <!-- The .NET 10 SDK dropped VSTest support from `dotnet test`. MSTest runs
+         on Microsoft.Testing.Platform instead; the repository opts in through
+         global.json. -->
+    <EnableMSTestRunner>true</EnableMSTestRunner>
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MSTest" />
+    <PackageReference Include="Moq" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WahooFitToGarmin-Desktop.Core\WahooFitToGarmin-Desktop.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -13,7 +13,7 @@ The application targets `netcoreapp3.1`, which reached end of life in December 2
 - Replace the current logging mechanism. Today `Helpers/LogEntry.cs` performs a synchronous `File.AppendText` inside its constructor, on the UI dispatcher thread, writing to a relative path that resolves to the process working directory, with no rotation and no size bound. Logging moves to a dedicated, non-blocking service writing to a bounded, rotating file under the user's local application data directory.
 - Journal unhandled exceptions. `App.OnDispatcherUnhandledException` is currently an empty method, so crashes are silent.
 - Fix `throw ex;` in `Core/GARMIN/Client.cs` (two occurrences), which destroys the original stack trace.
-- Add a `WahooFitToGarmin.Tests` xUnit project wired into the solution.
+- Add a `WahooFitToGarmin.Tests` project wired into the solution, using MSTest and Moq.
 
 Explicitly out of scope: no user-visible behaviour changes. The folder watcher, the "keep uploaded activity file" option, toast notifications, the in-app log viewer, theme selection, navigation, settings persistence, and the Garmin upload path all behave exactly as before. The solution must still build and run as a WPF application at the end of this change.
 
@@ -45,7 +45,7 @@ None. `openspec/specs/` is empty; this is the first change to introduce specs.
 
 **Dependencies**
 - Removed: `Newtonsoft.Json`, `Microsoft.Toolkit.Mvvm`
-- Added: `CommunityToolkit.Mvvm` 8.x, a logging library, xUnit
+- Added: `CommunityToolkit.Mvvm` 8.x, a logging library, MSTest, Moq
 - Unchanged in this change: `Flurl.Http` 4.0.0, `OAuth.DotNetCore`, `MahApps.Metro`, `Microsoft.Toolkit.Uwp.Notifications`, `Hardcodet.NotifyIcon.Wpf`
 
 **Users**

@@ -1,4 +1,3 @@
-﻿using System.IO;
 using System.Text;
 
 using Newtonsoft.Json;
@@ -10,20 +9,22 @@ namespace WahooFitToGarmin_Desktop.Core.Services
 {
     public class FileService : IFileService
     {
-        public T Read<T>(string folderPath, string fileName)
+        public T? Read<T>(string folderPath, string fileName)
         {
             var path = Path.Combine(folderPath, fileName);
-            if (File.Exists(path))
+            if (!File.Exists(path))
             {
-                var fileContent = File.ReadAllText(path);
-                if (fileContent.StartsWith("{"))
-                    return JsonConvert.DeserializeObject<T>(fileContent);
-
-                var json = StringExtensions.DecodeBase64(fileContent, Encoding.UTF8);
-                return JsonConvert.DeserializeObject<T>(json);
+                return default;
             }
 
-            return default;
+            var fileContent = File.ReadAllText(path);
+            if (fileContent.StartsWith('{'))
+            {
+                return JsonConvert.DeserializeObject<T>(fileContent);
+            }
+
+            var json = StringExtensions.DecodeBase64(fileContent, Encoding.UTF8);
+            return json is null ? default : JsonConvert.DeserializeObject<T>(json);
         }
 
         public void Save<T>(string folderPath, string fileName, T content)
