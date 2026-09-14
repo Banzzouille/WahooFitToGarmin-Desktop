@@ -54,25 +54,25 @@
 
 ## 6. Pipeline
 
-- [ ] 6.1 Implement the in-memory queue, with the discovery callback only enqueueing
-- [ ] 6.2 Implement the single serial worker
-- [ ] 6.3 Implement the processing sequence: readiness, read, hash, idempotence check, transformation set, upload, outcome, retention
-- [ ] 6.4 Ship the transformation set empty, verifying uploaded bytes are identical to file content
-- [ ] 6.5 Implement outcome classification: success, duplicate, transient failure, permanent failure
-- [ ] 6.6 Implement retry with exponential backoff and jitter, bounded attempts, transient failures only
-- [ ] 6.7 Implement single renewal and single retry on an unauthorised response
-- [ ] 6.8 Implement retention: delete only on confirmed success with retention off; retain on duplicate, failure, and retention on
-- [ ] 6.9 Implement the processed, failed, and duplicate counters with change notification
-- [ ] 6.10 Ensure an unexpected exception is logged, counted as a failure, and does not stop the worker
+- [x] 6.1 Implement the in-memory queue, with the discovery callback only enqueueing
+- [x] 6.2 Implement the single serial worker
+- [x] 6.3 Implement the processing sequence: readiness, read, hash, idempotence check, transformation set, upload, outcome, retention
+- [x] 6.4 Ship the transformation set empty, verifying uploaded bytes are identical to file content
+- [x] 6.5 Implement outcome classification: success, duplicate, transient failure, permanent failure
+- [x] 6.6 Implement retry with exponential backoff and jitter, bounded attempts, transient failures only
+- [x] 6.7 Implement single renewal and single retry on an unauthorised response
+- [x] 6.8 Implement retention: delete only on confirmed success with retention off; retain on duplicate, failure, and retention on
+- [x] 6.9 Implement the processed, failed, and duplicate counters with change notification
+- [x] 6.10 Ensure an unexpected exception is logged, counted as a failure, and does not stop the worker
 - [ ] 6.11 Preserve the log message wording recorded in 1.4
-- [ ] 6.12 Test: transient failure retried then succeeding is counted as processed
-- [ ] 6.13 Test: retries stop at the configured maximum
-- [ ] 6.14 Test: a client error is not retried
-- [ ] 6.15 Test: an unauthorised response triggers renewal then one retry
-- [ ] 6.16 Test: a duplicate is counted as duplicate, not retried, and the file is retained
-- [ ] 6.17 Test: a failure retains the source file
-- [ ] 6.18 Test: an exception in one activity does not prevent the next from being processed
-- [ ] 6.19 Test: files queued during an in-flight upload are processed afterwards, in order
+- [x] 6.12 Test: transient failure retried then succeeding is counted as processed
+- [x] 6.13 Test: retries stop at the configured maximum
+- [x] 6.14 Test: a client error is not retried
+- [x] 6.15 Test: an unauthorised response triggers renewal then one retry
+- [x] 6.16 Test: a duplicate is counted as duplicate, not retried, and the file is retained
+- [x] 6.17 Test: a failure retains the source file
+- [x] 6.18 Test: an exception in one activity does not prevent the next from being processed
+- [x] 6.19 Test: files queued during an in-flight upload are processed afterwards, in order
 
 ## 7. Discovery
 
