@@ -1,31 +1,57 @@
-﻿using System;
-using System.Windows.Forms;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 
-using Microsoft.Extensions.Options;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+
+using Microsoft.Extensions.Options;
+
 using WahooFitToGarmin_Desktop.Contracts.Services;
 using WahooFitToGarmin_Desktop.Contracts.ViewModels;
+using WahooFitToGarmin_Desktop.Core.Platform;
+using WahooFitToGarmin_Desktop.Core.Settings;
 using WahooFitToGarmin_Desktop.Models;
 
 namespace WahooFitToGarmin_Desktop.ViewModels
 {
+    /// <summary>
+    /// Presentation for the settings page.
+    /// </summary>
+    /// <remarks>
+    /// Every user setting is read from and written to the settings store, which
+    /// is the single source of truth and persists on change. The page no longer
+    /// writes to the application's property bag or to its shipped configuration,
+    /// and nothing here requires the application to be restarted.
+    /// </remarks>
     public class SettingsViewModel : ObservableObject, INavigationAware
     {
         private readonly AppConfig _appConfig;
+        private readonly ISettingsStore _settingsStore;
+        private readonly IFolderPicker _folderPicker;
         private readonly IThemeSelectorService _themeSelectorService;
         private readonly ISystemService _systemService;
         private readonly IApplicationInfoService _applicationInfoService;
+
         private AppTheme _theme;
-        private string _versionDescription;
-        private string _wahooDropBoxFolder;
-        private string _garminLogin;
-        private string _garminPwd;
-        private bool _keepUploadedActivityFile;
-        private ICommand _setThemeCommand;
-        private ICommand _githubUrlCommand;
-        private ICommand _selectWahooFolderCommand;
+        private string? _versionDescription;
+        private ICommand? _setThemeCommand;
+        private ICommand? _githubUrlCommand;
+        private ICommand? _selectWahooFolderCommand;
+
+        public SettingsViewModel(
+            IOptions<AppConfig> appConfig,
+            ISettingsStore settingsStore,
+            IFolderPicker folderPicker,
+            IThemeSelectorService themeSelectorService,
+            ISystemService systemService,
+            IApplicationInfoService applicationInfoService)
+        {
+            _appConfig = appConfig.Value;
+            _settingsStore = settingsStore;
+            _folderPicker = folderPicker;
+            _themeSelectorService = themeSelectorService;
+            _systemService = systemService;
+            _applicationInfoService = applicationInfoService;
+        }
 
         public AppTheme Theme
         {
@@ -35,44 +61,65 @@ namespace WahooFitToGarmin_Desktop.ViewModels
 
         public bool KeepUploadedActivityFile
         {
-            get => _keepUploadedActivityFile;
+            get => _settingsStore.Current.KeepUploadedActivityFile;
             set
             {
-                SetProperty(ref _keepUploadedActivityFile, value);
-                _appConfig.KeepUploadedActivityFile = value;
-                App.Current.Properties["KeepUploadedActivityFile"] = value;
+                if (value == _settingsStore.Current.KeepUploadedActivityFile)
+                {
+                    return;
+                }
+
+                _settingsStore.Update(s => s with { KeepUploadedActivityFile = value });
+                OnPropertyChanged();
             }
         }
 
-        public string GarminLogin
+        public string? GarminLogin
         {
-            get => _garminLogin;
+            get => _settingsStore.Current.GarminLogin;
             set
             {
-                SetProperty(ref _garminLogin, value);
-                _appConfig.GarminLogin = value;
-                App.Current.Properties["GarminLogin"] = value;
+                if (value == _settingsStore.Current.GarminLogin)
+                {
+                    return;
+                }
+
+                _settingsStore.Update(s => s with { GarminLogin = value });
+                OnPropertyChanged();
             }
         }
 
-        public string GarminPwd
+        public string? GarminPwd
         {
-            get => _garminPwd;
+            get => _settingsStore.Current.GarminPassword;
             set
             {
-                SetProperty(ref _garminPwd, value);
-                _appConfig.GarminPwd = value;
-                App.Current.Properties["GarminPwd"] = value;
+                if (value == _settingsStore.Current.GarminPassword)
+                {
+                    return;
+                }
+
+                _settingsStore.Update(s => s with { GarminPassword = value });
+                OnPropertyChanged();
             }
         }
 
-        public string WahooDropBoxFolder
+        public string? WahooDropBoxFolder
         {
-            get => _wahooDropBoxFolder;
-            set => SetProperty(ref _wahooDropBoxFolder, value);
+            get => _settingsStore.Current.WatchedFolder;
+            private set
+            {
+                if (value == _settingsStore.Current.WatchedFolder)
+                {
+                    return;
+                }
+
+                _settingsStore.Update(s => s with { WatchedFolder = value });
+                OnPropertyChanged();
+            }
         }
 
-        public string VersionDescription
+        public string? VersionDescription
         {
             get => _versionDescription;
             set => SetProperty(ref _versionDescription, value);
@@ -82,52 +129,55 @@ namespace WahooFitToGarmin_Desktop.ViewModels
 
         public ICommand GithubUrlCommand => _githubUrlCommand ??= new RelayCommand(OnGithubUrl);
 
-        public ICommand SelectWahooFolderCommand => _selectWahooFolderCommand ??= new RelayCommand(OnSelectWahooFolder);
-
-        public SettingsViewModel(IOptions<AppConfig> appConfig, IThemeSelectorService themeSelectorService, ISystemService systemService, IApplicationInfoService applicationInfoService)
-        {
-            _appConfig = appConfig.Value;
-            _themeSelectorService = themeSelectorService;
-            _systemService = systemService;
-            _applicationInfoService = applicationInfoService;
-        }
+        public ICommand SelectWahooFolderCommand =>
+            _selectWahooFolderCommand ??= new AsyncRelayCommand(OnSelectWahooFolderAsync);
 
         public void OnNavigatedTo(object parameter)
         {
             VersionDescription = $"{Properties.Resources.AppDisplayName} - {_applicationInfoService.GetVersion()}";
             Theme = _themeSelectorService.GetCurrentTheme();
-            WahooDropBoxFolder = App.Current.Properties["WahooDropBoxFolder"]?.ToString();
-            GarminLogin = App.Current.Properties["GarminLogin"]?.ToString();
-            GarminPwd = App.Current.Properties["GarminPwd"]?.ToString();
-            bool keepFile ;
-            bool.TryParse(App.Current.Properties["KeepUploadedActivityFile"]?.ToString(),out keepFile);
-            KeepUploadedActivityFile = keepFile;
+
+            // The settings-backed properties read straight through to the store,
+            // so they only need a notification to refresh the bindings.
+            OnPropertyChanged(nameof(WahooDropBoxFolder));
+            OnPropertyChanged(nameof(GarminLogin));
+            OnPropertyChanged(nameof(GarminPwd));
+            OnPropertyChanged(nameof(KeepUploadedActivityFile));
         }
 
         public void OnNavigatedFrom()
         {
         }
 
-        private void OnSetTheme(string themeName)
+        private void OnSetTheme(string? themeName)
         {
-            var theme = (AppTheme)Enum.Parse(typeof(AppTheme), themeName);
+            if (string.IsNullOrWhiteSpace(themeName))
+            {
+                return;
+            }
+
+            var theme = Enum.Parse<AppTheme>(themeName);
             _themeSelectorService.SetTheme(theme);
         }
 
         private void OnGithubUrl()
-            => _systemService.OpenInWebBrowser(_appConfig.GithubUrl);
-
-        private void OnSelectWahooFolder()
         {
-            var folderDlg = new FolderBrowserDialog();
-            folderDlg.ShowNewFolderButton = false;
-            // Show the FolderBrowserDialog.  
-            var result = folderDlg.ShowDialog();
-            if (result != DialogResult.OK) return;
+            if (!string.IsNullOrWhiteSpace(_appConfig.GithubUrl))
+            {
+                _systemService.OpenInWebBrowser(_appConfig.GithubUrl);
+            }
+        }
 
-            WahooDropBoxFolder = folderDlg.SelectedPath;
-            _appConfig.WahooDropBoxFolder = folderDlg.SelectedPath;
-            App.Current.Properties["WahooDropBoxFolder"] = folderDlg.SelectedPath;
+        private async Task OnSelectWahooFolderAsync()
+        {
+            var chosen = await _folderPicker.PickFolderAsync(_settingsStore.Current.WatchedFolder);
+            if (chosen is null)
+            {
+                // Cancelled: the configured folder is left untouched.
+                return;
+            }
+
+            WahooDropBoxFolder = chosen;
         }
     }
 }

@@ -18,19 +18,17 @@ namespace WahooFitToGarmin_Desktop.Services
         private readonly IServiceProvider _serviceProvider;
         private readonly INavigationService _navigationService;
         private readonly IToastNotificationsService _toastNotificationsService;
-        private readonly IPersistAndRestoreService _persistAndRestoreService;
         private readonly IThemeSelectorService _themeSelectorService;
         private readonly IEnumerable<IActivationHandler> _activationHandlers;
         private IShellWindow _shellWindow;
         private bool _isInitialized;
 
-        public ApplicationHostService(IServiceProvider serviceProvider, IEnumerable<IActivationHandler> activationHandlers, INavigationService navigationService, IThemeSelectorService themeSelectorService, IPersistAndRestoreService persistAndRestoreService, IToastNotificationsService toastNotificationsService)
+        public ApplicationHostService(IServiceProvider serviceProvider, IEnumerable<IActivationHandler> activationHandlers, INavigationService navigationService, IThemeSelectorService themeSelectorService, IToastNotificationsService toastNotificationsService)
         {
             _serviceProvider = serviceProvider;
             _activationHandlers = activationHandlers;
             _navigationService = navigationService;
             _themeSelectorService = themeSelectorService;
-            _persistAndRestoreService = persistAndRestoreService;
             _toastNotificationsService = toastNotificationsService;
         }
 
@@ -48,7 +46,6 @@ namespace WahooFitToGarmin_Desktop.Services
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            _persistAndRestoreService.PersistData();
             await Task.CompletedTask;
         }
 
@@ -56,7 +53,9 @@ namespace WahooFitToGarmin_Desktop.Services
         {
             if (!_isInitialized)
             {
-                _persistAndRestoreService.RestoreData();
+                // Settings load themselves now: the store reads on construction
+                // and persists on every change, so there is nothing to restore
+                // here and nothing to flush at shutdown.
                 _themeSelectorService.InitializeTheme();
                 await Task.CompletedTask;
             }

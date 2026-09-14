@@ -1,35 +1,35 @@
 ## 1. Preconditions
 
-- [ ] 1.1 Confirm `modernize-dotnet10-foundation` is merged: .NET 10, central package management, `ILogger<T>` available in the core library, test project in place
-- [ ] 1.2 Create branch `refactor/platform-agnostic-core`
-- [ ] 1.3 Collect sample `.fit` files for tests, including one real Wahoo export
-- [ ] 1.4 Record the current log message wording emitted during startup, detection, connection, and upload, so it can be preserved
+- [x] 1.1 Confirm `modernize-dotnet10-foundation` is merged: .NET 10, central package management, `ILogger<T>` available in the core library, test project in place
+- [x] 1.2 Create branch `refactor/platform-agnostic-core`
+- [ ] 1.3 Collect sample `.fit` files for tests, including one real Wahoo export. Not needed for the pipeline's own tests, which operate on arbitrary bytes because nothing here parses FIT content — that arrives with `fit-device-emulation`. Required for the end-to-end verification in group 10
+- [x] 1.4 Record the current log message wording emitted during startup, detection, connection, and upload, so it can be preserved — captured by `modernize-dotnet10-foundation` in `baseline-log-messages.md`
 
 ## 2. Abstractions
 
-- [ ] 2.1 Define the settings store interface: read typed settings, update, change notification
-- [ ] 2.2 Define the processed-activity record interface: check, mark, prune
-- [ ] 2.3 Define the Garmin session interface: obtain a valid session, renewing when expired
-- [ ] 2.4 Define the activity transformation interface, applied to file content before upload
-- [ ] 2.5 Define the notifier interface
-- [ ] 2.6 Define the folder picker interface
-- [ ] 2.7 Define the user interface dispatcher interface
-- [ ] 2.8 Confirm every new interface lives in the core library and none references a user interface type
+- [x] 2.1 Define the settings store interface: read typed settings, update, change notification
+- [x] 2.2 Define the processed-activity record interface: check, mark, prune
+- [x] 2.3 Define the Garmin session interface: obtain a valid session, renewing when expired
+- [x] 2.4 Define the activity transformation interface, applied to file content before upload
+- [x] 2.5 Define the notifier interface
+- [x] 2.6 Define the folder picker interface
+- [x] 2.7 Define the user interface dispatcher interface
+- [x] 2.8 Confirm every new interface lives in the core library and none references a user interface type
 
 ## 3. Settings store
 
-- [ ] 3.1 Define the typed user settings object: watched folder, Garmin credentials, keep-uploaded-file, theme
-- [ ] 3.2 Split `AppConfig` so that shipped configuration and user settings no longer share a type
-- [ ] 3.3 Implement the store: load on start, persist on change, raise change notification
-- [ ] 3.4 Implement migration from the previous base64-wrapped file, preserving the original under a backup name
-- [ ] 3.5 Fall back to defaults and log when a stored value cannot be parsed
-- [ ] 3.6 Log and continue when settings cannot be written
-- [ ] 3.7 Test: previous-format settings migrate with all five values intact
-- [ ] 3.8 Test: the previous file is preserved as a backup
-- [ ] 3.9 Test: migration does not run a second time
-- [ ] 3.10 Test: a missing previous file is not reported as a failure
-- [ ] 3.11 Test: an unparseable value falls back to its default without crashing
-- [ ] 3.12 Test: a changed setting is readable after simulated abrupt termination
+- [x] 3.1 Define the typed user settings object: watched folder, Garmin credentials, keep-uploaded-file, theme
+- [x] 3.2 Split `AppConfig` so that shipped configuration and user settings no longer share a type
+- [x] 3.3 Implement the store: load on start, persist on change, raise change notification
+- [x] 3.4 Implement migration from the previous base64-wrapped file, preserving the original under a backup name
+- [x] 3.5 Fall back to defaults and log when a stored value cannot be parsed
+- [x] 3.6 Log and continue when settings cannot be written
+- [x] 3.7 Test: previous-format settings migrate with all five values intact
+- [x] 3.8 Test: the previous file is preserved as a backup
+- [x] 3.9 Test: migration does not run a second time
+- [x] 3.10 Test: a missing previous file is not reported as a failure
+- [x] 3.11 Test: an unparseable value falls back to its default without crashing
+- [x] 3.12 Test: a changed setting is readable after simulated abrupt termination
 
 ## 4. Processed-activity record
 
@@ -102,12 +102,12 @@
 
 - [ ] 9.1 Register the pipeline as a hosted service in the existing generic host
 - [ ] 9.2 Register the settings store, record, session, and abstractions in the container
-- [ ] 9.3 Implement the WPF notifier over the existing toast service
-- [ ] 9.4 Implement the WPF folder picker over the existing folder dialog
-- [ ] 9.5 Implement the WPF dispatcher over the existing application dispatcher
+- [x] 9.3 Implement the WPF notifier over the existing toast service
+- [x] 9.4 Implement the WPF folder picker over the existing folder dialog
+- [x] 9.5 Implement the WPF dispatcher over the existing application dispatcher
 - [ ] 9.6 Reduce `MainViewModel` to log display and counters; remove watcher construction, authentication, upload, and deletion
-- [ ] 9.7 Bind `SettingsViewModel` to the settings store; remove the `App.Current.Properties` writes
-- [ ] 9.8 Delete `PersistAndRestoreService` and its interface
+- [x] 9.7 Bind `SettingsViewModel` to the settings store; remove the `App.Current.Properties` writes
+- [x] 9.8 Delete `PersistAndRestoreService` and its interface
 - [ ] 9.9 Remove the "restart the application to apply" message and any other restart instruction
 - [ ] 9.10 Verify no view model constructs a watcher, reads files, authenticates, uploads, or deletes
 

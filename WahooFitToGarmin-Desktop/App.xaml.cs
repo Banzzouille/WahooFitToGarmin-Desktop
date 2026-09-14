@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Toolkit.Uwp.Notifications;
 
 using Serilog;
@@ -19,10 +20,13 @@ using WahooFitToGarmin_Desktop.Contracts.Activation;
 using WahooFitToGarmin_Desktop.Contracts.Services;
 using WahooFitToGarmin_Desktop.Contracts.Views;
 using WahooFitToGarmin_Desktop.Core.Contracts.Services;
+using WahooFitToGarmin_Desktop.Core.Platform;
 using WahooFitToGarmin_Desktop.Core.Services;
+using WahooFitToGarmin_Desktop.Core.Settings;
 using WahooFitToGarmin_Desktop.Models;
 using WahooFitToGarmin_Desktop.Services;
 using WahooFitToGarmin_Desktop.Services.Logging;
+using WahooFitToGarmin_Desktop.Services.Platform;
 using WahooFitToGarmin_Desktop.ViewModels;
 using WahooFitToGarmin_Desktop.Views;
 
@@ -113,7 +117,28 @@ namespace WahooFitToGarmin_Desktop
             services.AddSingleton<IToastNotificationsService, ToastNotificationsService>();
             services.AddSingleton<IApplicationInfoService, ApplicationInfoService>();
             services.AddSingleton<ISystemService, SystemService>();
-            services.AddSingleton<IPersistAndRestoreService, PersistAndRestoreService>();
+            // The settings store owns user settings: it loads on construction,
+            // migrates the previous format once, and persists on every change.
+            services.AddSingleton<ISettingsStore>(sp =>
+            {
+                var appConfig = sp.GetRequiredService<IOptions<AppConfig>>().Value;
+                var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                var relative = (appConfig.ConfigurationsFolder ?? Path.Combine("WahooFitToGarmin_Desktop", "Configurations"))
+                    .Replace('\\', Path.DirectorySeparatorChar)
+                    .Replace('/', Path.DirectorySeparatorChar);
+
+                return new SettingsStore(
+                    sp.GetRequiredService<IFileService>(),
+                    sp.GetRequiredService<ILogger<SettingsStore>>(),
+                    Path.Combine(localAppData, relative),
+                    appConfig.SettingsFileName ?? "Settings.json");
+            });
+
+            // Platform implementations of the core abstractions. All three are
+            // replaced by avalonia-ui-port.
+            services.AddSingleton<IFolderPicker, WpfFolderPicker>();
+            services.AddSingleton<IUiDispatcher, WpfUiDispatcher>();
+            services.AddSingleton<INotifier, ToastNotifier>();
             services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
             services.AddSingleton<IPageService, PageService>();
             services.AddSingleton<INavigationService, NavigationService>();
