@@ -8,7 +8,7 @@ I didn't want to continue to synchronize manually each time i do an activity bet
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Banzzouille/WahooFitToGarmin,Banzzouille/WahooFitToGarmin-Desktop&type=Date)](https://star-history.com/#Banzzouille/WahooFitToGarmin&Banzzouille/WahooFitToGarmin-Desktop&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=Banzzouille/WahooFitToGarmin,Banzzouille/WahooFitToGarmin-Desktop&type=Date)](https://www.star-history.com/?type=date&repos=Banzzouille%2FWahooFitToGarmin%2CBanzzouille%2FWahooFitToGarmin-Desktop)
 
 # What you need
 
