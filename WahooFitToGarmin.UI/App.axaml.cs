@@ -48,10 +48,23 @@ public partial class App : Application
             // Another instance is already watching the folder; it has been asked
             // to show its window. Two processes on one folder would upload the
             // same activity twice.
-            desktop.Shutdown();
+            //
+            // Leaving through the lifetime is not an option here: the dispatcher
+            // loop has not started yet, and asking it to shut down throws. The
+            // process has built nothing worth unwinding, so it simply stops.
+            _instanceGuard.Dispose();
+            Environment.Exit(0);
             return;
         }
 
+        _instanceGuard.ListenerFailed += ex =>
+        {
+            // This runs before the host exists, so the logger is not configured
+            // yet. Standard error is the only channel available at this point,
+            // and a guard that silently fails to guard has to be visible.
+            Console.Error.WriteLine($"[single-instance] listener failed: {ex}");
+            Log.Warning(ex, "The single instance listener could not be established; a second launch will not be prevented");
+        };
         _instanceGuard.ActivationRequested += () =>
             Avalonia.Threading.Dispatcher.UIThread.Post(ShowWindow);
 
@@ -188,6 +201,10 @@ public partial class App : Application
         {
             e.Cancel = true;
             _window?.Hide();
+
+            // Running in the background now: menu bar only, out of the Dock and
+            // out of the application switcher.
+            MacOsDockVisibility.Set(visibleInDock: false);
         }
     }
 
@@ -197,6 +214,10 @@ public partial class App : Application
         {
             return;
         }
+
+        // Back to an ordinary application before showing, so the window can
+        // take focus and the icon is there while it is on screen.
+        MacOsDockVisibility.Set(visibleInDock: true);
 
         _window.Show();
         _window.WindowState = WindowState.Normal;

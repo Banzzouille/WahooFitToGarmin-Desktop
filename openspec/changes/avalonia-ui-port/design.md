@@ -69,7 +69,23 @@ The application lifetime uses `ShutdownMode.OnExplicitShutdown`. The main window
 
 macOS requires a monochrome template image for the status bar; the existing coloured `.ico` and `.png` assets will render badly. A monochrome PNG asset is added for the macOS menu bar, with the coloured icon retained for Windows.
 
-The macOS Dock icon is kept. Hiding it would require marking the bundle as a UI element agent, which changes activation behaviour in ways that are not worth the complexity for a first cross-platform release.
+The macOS Dock icon follows the window rather than staying put. An earlier
+version of this decision kept it permanently, on the grounds that hiding it meant
+marking the bundle as a user interface element and that was not worth the
+complexity. That was wrong on both counts, and it was wrong in a way a user
+noticed immediately: an application that has been closed to the menu bar has no
+business still occupying the Dock.
+
+The static property is indeed the wrong tool — it is all or nothing, so the icon
+would never appear, not even while someone has the window open and is working in
+it. The right tool is the activation policy, switched at runtime: an ordinary
+application while the window is shown, a background utility once it is closed.
+That is about thirty lines of interop, not the complexity the original decision
+imagined.
+
+Verified on macOS: the system reports the process as `Foreground` with the window
+open and `UIElement` once it is closed, across repeated cycles, with the process
+still running and still watching throughout.
 
 ### D7 — Single-instance guard, introduced because close-to-tray makes it necessary
 

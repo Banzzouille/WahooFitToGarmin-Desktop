@@ -24,6 +24,13 @@ public sealed class SingleInstanceGuard : IDisposable
     private readonly CancellationTokenSource _listening = new();
     private Task? _listener;
 
+    /// <summary>
+    /// Reports a listener that could not be established. The guard degrades to
+    /// allowing a second instance rather than blocking the first, so a failure
+    /// here has to be visible or it looks like the guard simply does not work.
+    /// </summary>
+    public event Action<Exception>? ListenerFailed;
+
     /// <summary>Raised when another launch asked for the window.</summary>
     public event Action? ActivationRequested;
 
@@ -38,7 +45,13 @@ public sealed class SingleInstanceGuard : IDisposable
             return false;
         }
 
+        // Nothing awaits this task, so an exception inside it would vanish.
+        // Faults are surfaced instead.
         _listener = Task.Run(ListenAsync);
+        _listener.ContinueWith(
+            x => ListenerFailed?.Invoke(x.Exception!.GetBaseException()),
+            TaskContinuationOptions.OnlyOnFaulted);
+
         return true;
     }
 
@@ -98,6 +111,13 @@ public sealed class SingleInstanceGuard : IDisposable
             catch (IOException)
             {
                 // A client that disconnected mid-handshake. Listen again.
+            }
+            catch (Exception ex)
+            {
+                // Anything else means no listener: report it and stop, rather
+                // than spinning on a condition that will not clear.
+                ListenerFailed?.Invoke(ex);
+                return;
             }
         }
     }
