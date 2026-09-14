@@ -44,6 +44,7 @@ public sealed class ActivityDiscoveryTests
     private FakeFileStore _files = null!;
     private FakeWatcher _watcher = null!;
     private FakeSettingsStore _settings = null!;
+    private FakeNotifier _notifier = null!;
 
     [TestInitialize]
     public void Setup()
@@ -56,6 +57,7 @@ public sealed class ActivityDiscoveryTests
         _files = new FakeFileStore();
         _watcher = new FakeWatcher();
         _settings = new FakeSettingsStore(new UserSettings { WatchedFolder = _folder });
+        _notifier = new FakeNotifier();
     }
 
     [TestCleanup]
@@ -79,7 +81,7 @@ public sealed class ActivityDiscoveryTests
             NullLogger.Instance, null, (_, _) => Task.CompletedTask);
 
         var discovery = new ActivityDiscovery(
-            _settings, record, _files, _watcher, pipeline, NullLogger.Instance);
+            _settings, record, _files, _watcher, pipeline, _notifier, NullLogger.Instance);
 
         return (discovery, pipeline, uploader);
     }
@@ -278,5 +280,44 @@ public sealed class ActivityDiscoveryTests
 
         Assert.AreEqual(1, uploader.Attempts);
         CollectionAssert.AreEqual(Encoding.UTF8.GetBytes("fresh ride"), uploader.Uploaded.Single());
+    }
+
+    [TestMethod]
+    public void AFileDetectedByTheWatcher_RaisesANotification()
+    {
+        var (discovery, _, _) = Create(new FakeRecord(isFirstRun: false));
+        discovery.Start();
+
+        var path = AddFile("ride.fit", "ride");
+        _watcher.Raise(path);
+
+        Assert.AreEqual(1, _notifier.Raised.Count, "no notification was raised on detection");
+        Assert.AreEqual("A new file is coming", _notifier.Raised[0].Title);
+        Assert.AreEqual("ride.fit", _notifier.Raised[0].Body);
+    }
+
+    [TestMethod]
+    public void TheStartupScan_DoesNotNotify()
+    {
+        // Restarting with files waiting must not produce a burst of
+        // notifications for activities the user already knows about.
+        AddFile("one.fit", "one");
+        AddFile("two.fit", "two");
+
+        var (discovery, _, _) = Create(new FakeRecord(isFirstRun: false));
+        discovery.Start();
+
+        Assert.AreEqual(0, _notifier.Raised.Count);
+    }
+
+    [TestMethod]
+    public void TheBaselineScan_DoesNotNotify()
+    {
+        AddFile("old.fit", "old");
+
+        var (discovery, _, _) = Create(new FakeRecord(isFirstRun: true));
+        discovery.Start();
+
+        Assert.AreEqual(0, _notifier.Raised.Count);
     }
 }

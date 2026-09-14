@@ -136,7 +136,7 @@
 
 ## 11. Settle open questions
 
-- [ ] 11.1 Determine the quiet interval and consecutive-check count empirically against a real Dropbox folder, then record the chosen values in the spec
-- [ ] 11.2 Decide the record retention strategy — by count or by age — and record it
-- [ ] 11.3 Record whether an explicit "import files already present" action should be raised as follow-up work for `avalonia-ui-port`
-- [ ] 11.4 Record the decision to keep duplicates from deleting the source file, so it is not revisited by accident
+- [x] 11.1 Determine the quiet interval and consecutive-check count empirically against a real Dropbox folder, then record the chosen values in the spec — chosen values recorded in the spec and in `decisions-settled.md`; confirming them against a real folder remains part of group 10, and `avalonia-ui-port` carries the macOS equivalent
+- [x] 11.2 Decide the record retention strategy — by count or by age — and record it
+- [x] 11.3 Record whether an explicit "import files already present" action should be raised as follow-up work for `avalonia-ui-port`
+- [x] 11.4 Record the decision to keep duplicates from deleting the source file, so it is not revisited by accident

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 
+using WahooFitToGarmin_Desktop.Core.Platform;
 using WahooFitToGarmin_Desktop.Core.Settings;
 
 namespace WahooFitToGarmin_Desktop.Core.Activities
@@ -35,6 +36,7 @@ namespace WahooFitToGarmin_Desktop.Core.Activities
         private readonly IActivityFileStore _files;
         private readonly IFolderWatcher _watcher;
         private readonly ActivityPipeline _pipeline;
+        private readonly INotifier _notifier;
         private readonly ILogger _logger;
 
         private string? _watchedFolder;
@@ -45,6 +47,7 @@ namespace WahooFitToGarmin_Desktop.Core.Activities
             IActivityFileStore files,
             IFolderWatcher watcher,
             ActivityPipeline pipeline,
+            INotifier notifier,
             ILogger logger)
         {
             _settings = settings;
@@ -52,6 +55,7 @@ namespace WahooFitToGarmin_Desktop.Core.Activities
             _files = files;
             _watcher = watcher;
             _pipeline = pipeline;
+            _notifier = notifier;
             _logger = logger;
 
             _watcher.FileAppeared += OnFileAppeared;
@@ -162,7 +166,20 @@ namespace WahooFitToGarmin_Desktop.Core.Activities
             _watcher.Watch(folder);
         }
 
-        private void OnFileAppeared(string path) => _pipeline.Enqueue(path);
+        private void OnFileAppeared(string path)
+        {
+            var fileName = Path.GetFileName(path);
+
+            // Announced at detection, as it always was. The startup scan stays
+            // quiet: a user restarting the application does not want a
+            // notification for every file waiting in the folder.
+            _logger.LogInformation("A new file is coming => {FileName}", fileName);
+            _notifier.Notify("A new file is coming", fileName);
+
+            _pipeline.Enqueue(path);
+
+            _logger.LogInformation("-------------------------------------------------------------------------------");
+        }
 
         private void OnSettingsChanged(object? sender, UserSettings settings)
         {

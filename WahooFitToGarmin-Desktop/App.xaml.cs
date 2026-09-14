@@ -184,6 +184,7 @@ namespace WahooFitToGarmin_Desktop
                 sp.GetRequiredService<IActivityFileStore>(),
                 sp.GetRequiredService<IFolderWatcher>(),
                 sp.GetRequiredService<ActivityPipeline>(),
+                sp.GetRequiredService<INotifier>(),
                 sp.GetRequiredService<ILogger<ActivityDiscovery>>()));
 
             // Platform implementations of the core abstractions. All three are

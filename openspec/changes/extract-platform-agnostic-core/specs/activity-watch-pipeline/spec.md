@@ -42,6 +42,8 @@ The pipeline SHALL detect `.fit` files appearing in the configured folder while 
 
 The pipeline SHALL NOT read an activity file until its content has stopped changing. A file SHALL be considered ready only after its length and last-write time remain unchanged across consecutive checks separated by a quiet interval, and it can be opened for reading.
 
+The quiet interval SHALL be one second, at least two consecutive unchanged observations SHALL be required, and a file still changing after two minutes SHALL be abandoned. These are fixed constants rather than settings: they are not values a user can reason about, and the point of them is that the behaviour is predictable. They were chosen against the write pattern of a desktop sync client and remain subject to confirmation against a real folder on each supported platform.
+
 #### Scenario: A file still being written is not uploaded
 
 - **WHEN** a file is created and then continues to grow for several seconds
@@ -113,6 +115,11 @@ The pipeline SHALL maintain a durable record of processed activities keyed on fi
 
 - **WHEN** a large number of activities have been processed over time
 - **THEN** the record is pruned and remains bounded in size
+
+#### Scenario: Pruning is by count, oldest first
+
+- **WHEN** the record exceeds 2000 entries
+- **THEN** the oldest entries are removed until it holds 2000, and the most recently recorded activities are retained
 
 #### Scenario: A lost record degrades safely
 

@@ -1,6 +1,7 @@
 using System.Text;
 
 using WahooFitToGarmin_Desktop.Core.Activities;
+using WahooFitToGarmin_Desktop.Core.Platform;
 using WahooFitToGarmin_Desktop.Core.Settings;
 
 namespace WahooFitToGarmin.Tests.Fakes;
@@ -129,4 +130,19 @@ internal sealed class ThrowingTransformation : IActivityTransformation
 {
     public byte[] Apply(byte[] content, string fileName) =>
         throw new InvalidOperationException("the file could not be prepared");
+}
+
+/// <summary>Records notifications instead of raising them.</summary>
+internal sealed class FakeNotifier : INotifier
+{
+    public List<(string Title, string Body)> Raised { get; } = [];
+
+    public void Notify(string title, string body) => Raised.Add((title, body));
+}
+
+/// <summary>A notifier whose platform refuses to deliver.</summary>
+internal sealed class FailingNotifier : INotifier
+{
+    public void Notify(string title, string body) =>
+        throw new InvalidOperationException("the platform refused the notification");
 }
