@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:WahooFitToGarmin.UI.ViewModels"
+             x:Class="WahooFitToGarmin.UI.Views.MainView"
+             x:DataType="vm:MainViewModel">
+
+  <Grid RowDefinitions="Auto,*" Margin="16">
+
+    <!-- Replaces a binding to a Count property no view model had, which
+         rendered as an empty " Items" for ever. -->
+    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="24" Margin="0,0,0,12">
+      <TextBlock Text="{Binding Processed, StringFormat='Uploaded: {0}'}" FontWeight="SemiBold" />
+      <TextBlock Text="{Binding Duplicates, StringFormat='Already present: {0}'}" />
+      <TextBlock Text="{Binding Failed, StringFormat='Failed: {0}'}" />
+    </StackPanel>
+
+    <Border Grid.Row="1" BorderThickness="1" CornerRadius="4"
+            BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+      <ScrollViewer>
+        <ItemsControl ItemsSource="{Binding LogEntries}" Margin="8">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Grid ColumnDefinitions="Auto,*" Margin="0,1">
+                <TextBlock Grid.Column="0"
+                           Text="{Binding LogDateTime, StringFormat='{}{0:HH:mm:ss}'}"
+                           FontFamily="{StaticResource MonospaceFont}"
+                           Opacity="0.6"
+                           Margin="0,0,12,0" />
+                <TextBlock Grid.Column="1"
+                           Text="{Binding LogMessage}"
+                           TextWrapping="Wrap" />
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+
+  </Grid>
+</UserControl>

@@ -8,6 +8,13 @@ namespace WahooFitToGarmin_Desktop.Core.Services
 {
     public class FileService : IFileService
     {
+        /// <summary>
+        /// UTF-8 without a byte order mark. <c>Encoding.UTF8</c> emits one, which
+        /// is pointless on a base64 payload and trips any tool that reads the
+        /// file without expecting it.
+        /// </summary>
+        private static readonly UTF8Encoding Utf8NoBom = new(encoderShouldEmitUTF8Identifier: false);
+
         private static readonly JsonSerializerOptions Options = new()
         {
             PropertyNameCaseInsensitive = true,
@@ -38,7 +45,7 @@ namespace WahooFitToGarmin_Desktop.Core.Services
 
             var json = fileContent.TrimStart().StartsWith('{')
                 ? fileContent
-                : StringExtensions.DecodeBase64(fileContent, Encoding.UTF8);
+                : StringExtensions.DecodeBase64(fileContent.Trim('\uFEFF'), Encoding.UTF8);
 
             if (string.IsNullOrWhiteSpace(json))
             {
@@ -58,7 +65,7 @@ namespace WahooFitToGarmin_Desktop.Core.Services
             var fileContent = JsonSerializer.Serialize(content, Options);
             var obfuscatedSettings = StringExtensions.EncodeBase64(fileContent, Encoding.UTF8);
 
-            File.WriteAllText(Path.Combine(folderPath, fileName), obfuscatedSettings, Encoding.UTF8);
+            File.WriteAllText(Path.Combine(folderPath, fileName), obfuscatedSettings, Utf8NoBom);
         }
 
         public void Delete(string folderPath, string fileName)

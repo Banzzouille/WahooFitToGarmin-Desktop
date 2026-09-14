@@ -5,6 +5,6 @@
     <Platform Name="x86" />
   </Configurations>
   <Project Path="WahooFitToGarmin-Desktop.Core/WahooFitToGarmin-Desktop.Core.csproj" />
-  <Project Path="WahooFitToGarmin-Desktop/WahooFitToGarmin-Desktop.csproj" />
   <Project Path="WahooFitToGarmin.Tests/WahooFitToGarmin.Tests.csproj" />
+  <Project Path="WahooFitToGarmin.UI/WahooFitToGarmin.UI.csproj" />
 </Solution>

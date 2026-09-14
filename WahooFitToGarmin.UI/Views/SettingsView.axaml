@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:WahooFitToGarmin.UI.ViewModels"
+             x:Class="WahooFitToGarmin.UI.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+
+  <ScrollViewer>
+    <StackPanel Margin="16" Spacing="20" MaxWidth="720" HorizontalAlignment="Left">
+
+      <TextBlock Text="Appearance" FontSize="18" FontWeight="SemiBold" />
+      <StackPanel Spacing="6">
+        <TextBlock Text="Theme" />
+        <ComboBox ItemsSource="{Binding Themes}"
+                  SelectedItem="{Binding SelectedTheme}"
+                  MinWidth="200" />
+        <TextBlock Text="Default follows your operating system."
+                   Opacity="0.7" FontSize="12" />
+      </StackPanel>
+
+      <TextBlock Text="Watched folder" FontSize="18" FontWeight="SemiBold" />
+      <StackPanel Spacing="6">
+        <TextBlock Text="Activity files dropped here are uploaded automatically." Opacity="0.7" FontSize="12" />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBox Text="{Binding WatchedFolder, Mode=OneWay}" IsReadOnly="True" MinWidth="460" />
+          <Button Content="Choose…" Command="{Binding SelectFolderCommand}" />
+        </StackPanel>
+        <CheckBox Content="Keep the file after it has been uploaded"
+                  IsChecked="{Binding KeepUploadedActivityFile}" />
+      </StackPanel>
+
+      <TextBlock Text="Garmin Connect" FontSize="18" FontWeight="SemiBold" />
+      <StackPanel Spacing="6">
+        <TextBlock Text="Email" />
+        <TextBox Text="{Binding GarminLogin}" MinWidth="360" />
+        <TextBlock Text="Password" />
+        <TextBox Text="{Binding GarminPassword}" PasswordChar="•" MinWidth="360" />
+      </StackPanel>
+
+      <TextBlock Text="About" FontSize="18" FontWeight="SemiBold" />
+      <StackPanel Spacing="6">
+        <TextBlock Text="{Binding Version, StringFormat='Version {0}'}" />
+        <Button Content="Open the project page" Command="{Binding OpenProjectPageCommand}" />
+      </StackPanel>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

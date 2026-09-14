@@ -1,0 +1,36 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:WahooFitToGarmin.UI"
+             xmlns:sty="using:FluentAvalonia.Styling"
+             x:Class="WahooFitToGarmin.UI.App"
+             RequestedThemeVariant="Default">
+
+  <Application.DataTemplates>
+    <local:ViewLocator />
+  </Application.DataTemplates>
+
+  <Application.Styles>
+    <sty:FluentAvaloniaTheme />
+  </Application.Styles>
+
+  <Application.Resources>
+    <FontFamily x:Key="MonospaceFont">Menlo,Consolas,monospace</FontFamily>
+  </Application.Resources>
+
+  <TrayIcon.Icons>
+    <TrayIcons>
+      <TrayIcon Icon="/Assets/garmin-wahoo-logo.ico"
+                ToolTipText="Wahoo Fit To Garmin"
+                Clicked="OnTrayClicked">
+        <TrayIcon.Menu>
+          <NativeMenu>
+            <NativeMenuItem Header="Open" Click="OnTrayOpen" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="Quit" Click="OnTrayQuit" />
+          </NativeMenu>
+        </TrayIcon.Menu>
+      </TrayIcon>
+    </TrayIcons>
+  </TrayIcon.Icons>
+
+</Application>

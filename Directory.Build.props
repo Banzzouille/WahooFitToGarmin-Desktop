@@ -5,16 +5,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
-    <!-- Nullable annotations are enabled everywhere, but the warnings they
-         produce are not errors. The core library is annotated properly in this
-         change; the desktop project's warnings are burned down as its files are
-         rewritten by later changes. See design.md, D8. -->
+    <!-- Nullable annotations are enabled everywhere; the warnings they produce
+         are not errors. -->
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-
-    <!-- Lets projects targeting net10.0-windows build on macOS and Linux, so the
-         whole solution compiles on any host. Harmless on Windows. Running the
-         WPF application still requires Windows. See design.md, D13. -->
-    <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
 
 </Project>

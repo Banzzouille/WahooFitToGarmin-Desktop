@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>Wahoo Fit To Garmin</string>
+
+    <key>CFBundleDisplayName</key>
+    <string>Wahoo Fit To Garmin</string>
+
+    <!-- Stable and never changed between releases: notification permissions the
+         user grants are tied to it. -->
+    <key>CFBundleIdentifier</key>
+    <string>com.banzzouille.wahoofittogarmin</string>
+
+    <key>CFBundleVersion</key>
+    <string>1.1.0</string>
+
+    <key>CFBundleShortVersionString</key>
+    <string>1.1.0</string>
+
+    <key>CFBundleExecutable</key>
+    <string>WahooFitToGarmin</string>
+
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+
+    <key>LSMinimumSystemVersion</key>
+    <string>12.0</string>
+
+    <!-- The application keeps watching the folder after its window is closed,
+         so it stays in the Dock rather than terminating. -->
+    <key>LSUIElement</key>
+    <false/>
+
+    <key>NSHighResolutionCapable</key>
+    <true/>
+
+    <key>NSHumanReadableCopyright</key>
+    <string>MIT licensed. Not affiliated with Garmin or Wahoo.</string>
+</dict>
+</plist>

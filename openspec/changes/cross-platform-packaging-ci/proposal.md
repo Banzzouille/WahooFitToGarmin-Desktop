@@ -19,6 +19,8 @@ This change makes the build reproducible, makes every change verified on both op
 
 Deliberately not included: an installer, a package manager formula, an automatic update mechanism, and code signing on either platform. Each is a reasonable future addition and none is required to make releases reproducible.
 
+On installers specifically, so the question is not reopened on a false premise: neither a disk image on macOS nor an installer package on Windows removes the friction of shipping unsigned. Quarantine applies to the application inside the disk image, not to the image, so the first-launch refusal is identical; an unsigned installer package triggers the same reputation warning an unsigned executable does. An installer makes distribution look more credible without making it smoother. The macOS disk image is the cheaper and more expected of the two and would be the one to start with, but both stay out until there is either a signing certificate or an update mechanism to justify the machinery.
+
 ## Capabilities
 
 ### New Capabilities
