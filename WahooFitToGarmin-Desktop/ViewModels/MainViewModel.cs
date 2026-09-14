@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using WahooFitToGarmin_Desktop.Contracts.Services;
 using WahooFitToGarmin_Desktop.Core.GARMIN;
 using WahooFitToGarmin_Desktop.Helpers;

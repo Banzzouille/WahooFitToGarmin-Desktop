@@ -1,28 +1,45 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk">
+
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<!-- WPF needs a Windows target framework, and the Windows Runtime
+		     notification APIs this project uses need a Windows SDK version on
+		     top of that. 19041 is the lowest version that projects them.
+		     See design.md, D1. -->
+		<TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
 		<RootNamespace>WahooFitToGarmin_Desktop</RootNamespace>
 		<UseWPF>true</UseWPF>
+		<UseWindowsForms>true</UseWindowsForms>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<ApplicationIcon>garmin-wahoo-logo.ico</ApplicationIcon>
-		<UseWindowsForms>true</UseWindowsForms>
 		<Version>1.1.0</Version>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- UseWindowsForms makes ImplicitUsings import System.Windows.Forms
+		     globally, which collides with WPF: `Application`, `MessageBox` and
+		     others exist in both. This is a WPF application that happens to use
+		     one Windows Forms dialog, so the implicit import is dropped and the
+		     single consumer imports it explicitly. -->
+		<Using Remove="System.Windows.Forms" />
+	</ItemGroup>
+
 	<ItemGroup>
 	  <Compile Remove="garmin-uploader\**" />
 	  <EmbeddedResource Remove="garmin-uploader\**" />
 	  <None Remove="garmin-uploader\**" />
 	  <Page Remove="garmin-uploader\**" />
 	</ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Flurl.Http" />
 		<PackageReference Include="Hardcodet.NotifyIcon.Wpf" />
 		<PackageReference Include="MahApps.Metro" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" />
-		<PackageReference Include="Microsoft.Toolkit.Mvvm" />
+		<PackageReference Include="CommunityToolkit.Mvvm" />
 		<PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" />
 	</ItemGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\WahooFitToGarmin-Desktop.Core\WahooFitToGarmin-Desktop.Core.csproj" />
 	</ItemGroup>
@@ -47,4 +64,5 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
+
 </Project>

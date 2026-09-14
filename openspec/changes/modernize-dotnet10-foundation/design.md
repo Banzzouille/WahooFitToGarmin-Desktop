@@ -108,6 +108,22 @@ The test project references Core only; the UI project's Windows TFM would make t
 
 In scope for this change: `FileService` round-trip, legacy base64 read compatibility, legacy plain-JSON read compatibility, `Dictionary<string, string>` projection fidelity, and a smoke test asserting the logger writes to the configured directory and rotates. No network tests against Garmin.
 
+## Addendum — D14: the solution moves to the `.slnx` format
+
+The legacy solution format is a line-oriented dialect that only Visual Studio ever
+wrote comfortably: forty lines of project identifiers, configuration mappings and
+globals, which merge badly and which nobody edits by hand without regret.
+
+The SDK now converts it in one command, and the result for this repository is ten
+lines of XML naming three projects. Merge conflicts in a solution file become
+readable, and adding a project is a one-line diff.
+
+The cost is tooling age: the format is newer than some of the editors and scripts
+that might open it. This project builds and tests entirely through the SDK, which
+supports it, and the packaging change later consumes it the same way. The one
+thing worth confirming rather than assuming is that whatever editor a contributor
+uses can open it — recorded as a task rather than hoped for.
+
 ## Risks / Trade-offs
 
 **`MahApps.Metro` 2.4.9 may not build against `net10.0-windows`** → Bump to the current 2.x release as part of this change. MahApps is deleted in `avalonia-ui-port`, so any version that compiles is acceptable; no time is spent on theming regressions beyond confirming the three themes still apply.

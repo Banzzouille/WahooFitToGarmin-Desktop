@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
 
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 using WahooFitToGarmin_Desktop.Contracts.Services;
 using WahooFitToGarmin_Desktop.ViewModels;

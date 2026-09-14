@@ -5,8 +5,8 @@ using System.Windows.Input;
 
 using MahApps.Metro.Controls;
 
-using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 using WahooFitToGarmin_Desktop.Contracts.Services;
 using WahooFitToGarmin_Desktop.Properties;

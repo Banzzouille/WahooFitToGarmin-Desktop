@@ -14,8 +14,6 @@
   </ItemGroup>
 
   <ItemGroup Label="Being removed during this change">
-    <!-- Replaced by CommunityToolkit.Mvvm in task group 6. -->
-    <PackageVersion Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
     <!-- Replaced by System.Text.Json in task group 8. -->
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>

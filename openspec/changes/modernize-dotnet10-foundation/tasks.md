@@ -19,6 +19,14 @@
 - [x] 2.4 Strip the `Version` attribute from every `PackageReference` in both project files
 - [x] 2.5 Verify the solution restores with centrally managed versions before changing any target framework
 
+## 2b. Solution format
+
+- [x] 2b.1 Migrate the solution from the legacy `.sln` format to `.slnx` with `dotnet sln migrate`
+- [x] 2b.2 Verify the whole solution builds from the `.slnx`
+- [x] 2b.3 Verify `dotnet test` runs from the `.slnx`
+- [x] 2b.4 Delete the legacy `.sln`
+- [ ] 2b.5 Confirm the `.slnx` opens in the editors the project's contributors use, since tooling support for the format is newer than the format itself
+
 ## 3. Core library retarget
 
 - [x] 3.1 Change `WahooFitToGarmin-Desktop.Core.csproj` target framework from `netstandard2.0` to `net10.0`
@@ -37,22 +45,22 @@
 
 ## 5. Desktop project retarget
 
-- [ ] 5.1 Change the project SDK from `Microsoft.NET.Sdk.WindowsDesktop` to `Microsoft.NET.Sdk`
-- [ ] 5.2 Set the target framework to `net10.0-windows10.0.19041.0`, keeping `UseWPF` and `UseWindowsForms` enabled
-- [ ] 5.3 Upgrade `Microsoft.Extensions.Hosting` to 10.x
-- [ ] 5.4 Upgrade `MahApps.Metro` to the version confirmed in 1.5
-- [ ] 5.5 Apply the notifications package decision from 1.6, adjusting `using` directives in `ToastNotificationsService.cs`, `ToastNotificationsService.Samples.cs`, `IToastNotificationsService.cs`, and `App.xaml.cs` if the package changed
-- [ ] 5.6 Build the desktop project and resolve compilation errors
-- [ ] 5.7 Regenerate `Properties/Resources.Designer.cs` if the build reports a generator mismatch
+- [x] 5.1 Change the project SDK from `Microsoft.NET.Sdk.WindowsDesktop` to `Microsoft.NET.Sdk`
+- [x] 5.2 Set the target framework to `net10.0-windows10.0.19041.0`, keeping `UseWPF` and `UseWindowsForms` enabled
+- [x] 5.3 Upgrade `Microsoft.Extensions.Hosting` to 10.x (10.0.12, declared centrally)
+- [x] 5.4 Upgrade `MahApps.Metro` to the version confirmed in 1.5 — no upgrade needed, the referenced 2.4.9 builds against the new target framework unchanged
+- [x] 5.5 Apply the notifications package decision from 1.6 — 7.1.2 resolves on the Windows SDK target, so the package stands and no `using` directive changed, adjusting `using` directives in `ToastNotificationsService.cs`, `ToastNotificationsService.Samples.cs`, `IToastNotificationsService.cs`, and `App.xaml.cs` if the package changed
+- [x] 5.6 Build the desktop project and resolve compilation errors — one ambiguity between the Windows Forms and WPF `Application` types, caused by implicit usings importing `System.Windows.Forms` globally; the implicit import is removed in the project file and the single consumer keeps its explicit one
+- [x] 5.7 Regenerate `Properties/Resources.Designer.cs` if the build reports a generator mismatch — no mismatch reported, left untouched
 - [ ] 5.8 Launch the application and confirm the shell window, navigation, main page, and settings page render
 
 ## 6. MVVM package migration
 
-- [ ] 6.1 Replace the `Microsoft.Toolkit.Mvvm` package reference with `CommunityToolkit.Mvvm` 8.x
-- [ ] 6.2 Update the `using` directives in `ViewModels/MainViewModel.cs`, `ViewModels/SettingsViewModel.cs`, `ViewModels/ShellViewModel.cs`, and `Services/PageService.cs`
-- [ ] 6.3 Build and confirm no other file referenced the old namespace
+- [x] 6.1 Replace the `Microsoft.Toolkit.Mvvm` package reference with `CommunityToolkit.Mvvm` 8.x
+- [x] 6.2 Update the `using` directives in `ViewModels/MainViewModel.cs`, `ViewModels/SettingsViewModel.cs`, `ViewModels/ShellViewModel.cs`, and `Services/PageService.cs`
+- [x] 6.3 Build and confirm no other file referenced the old namespace
 - [ ] 6.4 Launch the application and confirm property change notification and all commands still work — theme radio buttons, folder selection, GitHub link, navigation, back button
-- [ ] 6.5 Confirm no XAML binding path was modified
+- [x] 6.5 Confirm no XAML binding path was modified
 
 ## 7. Logging pipeline
 

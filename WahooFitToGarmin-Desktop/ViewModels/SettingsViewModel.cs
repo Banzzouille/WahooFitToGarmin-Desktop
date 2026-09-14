@@ -3,8 +3,8 @@ using System.Windows.Forms;
 using System.Windows.Input;
 
 using Microsoft.Extensions.Options;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using WahooFitToGarmin_Desktop.Contracts.Services;
 using WahooFitToGarmin_Desktop.Contracts.ViewModels;
 using WahooFitToGarmin_Desktop.Models;

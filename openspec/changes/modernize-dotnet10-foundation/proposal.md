@@ -7,6 +7,7 @@ The application targets `netcoreapp3.1`, which reached end of life in December 2
 - Retarget both projects to .NET 10 (LTS): `WahooFitToGarmin-Desktop.Core` from `netstandard2.0`, `WahooFitToGarmin-Desktop` from `netcoreapp3.1`. The UI project stays WPF/Windows-only at this stage; cross-platform support is a later change.
 - Enable `Nullable`, `ImplicitUsings`, and `LangVersion latest` on both projects.
 - Introduce `Directory.Packages.props` for central package version management.
+- Replace the legacy `.sln` solution file with the XML `.slnx` format, which the .NET SDK now migrates to directly. **BREAKING** for tooling older than the format: editors and build scripts that only understand `.sln` stop finding the solution.
 - Migrate `Microsoft.Toolkit.Mvvm` 7.1.2 to `CommunityToolkit.Mvvm` 8.x, including the `Microsoft.Toolkit.Mvvm.*` to `CommunityToolkit.Mvvm.*` namespace change.
 - Upgrade `Microsoft.Extensions.Hosting` to 10.x.
 - Replace `Newtonsoft.Json` with `System.Text.Json` in `Core/Services/FileService.cs`. **BREAKING** at the storage layer: the persisted settings file is read by both serializers during a transition window so existing installs are not lost.
@@ -33,7 +34,7 @@ None. `openspec/specs/` is empty; this is the first change to introduce specs.
 **Project files**
 - `WahooFitToGarmin-Desktop/WahooFitToGarmin-Desktop.csproj` — target framework, SDK, language settings, package references
 - `WahooFitToGarmin-Desktop.Core/WahooFitToGarmin-Desktop.Core.csproj` — target framework, language settings, package references
-- `WahooFitToGarmin-Desktop.sln` — new test project entry
+- `WahooFitToGarmin-Desktop.sln` — replaced by `WahooFitToGarmin-Desktop.slnx`
 - New: `Directory.Packages.props`, `WahooFitToGarmin.Tests/`
 
 **Source**
