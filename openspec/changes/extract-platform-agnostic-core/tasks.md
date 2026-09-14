@@ -33,24 +33,24 @@
 
 ## 4. Processed-activity record
 
-- [ ] 4.1 Implement content hashing of activity bytes
-- [ ] 4.2 Implement the durable record: hash, original file name, outcome, timestamp
-- [ ] 4.3 Implement pruning so the record stays bounded
-- [ ] 4.4 Implement first-run detection based on the absence of the record
-- [ ] 4.5 Test: the same content under a different name is recognised as already processed
-- [ ] 4.6 Test: the record survives a restart
-- [ ] 4.7 Test: pruning keeps the record bounded
-- [ ] 4.8 Test: a missing record does not crash and results in re-offering the file
+- [x] 4.1 Implement content hashing of activity bytes
+- [x] 4.2 Implement the durable record: hash, original file name, outcome, timestamp
+- [x] 4.3 Implement pruning so the record stays bounded
+- [x] 4.4 Implement first-run detection based on the absence of the record
+- [x] 4.5 Test: the same content under a different name is recognised as already processed
+- [x] 4.6 Test: the record survives a restart
+- [x] 4.7 Test: pruning keeps the record bounded
+- [x] 4.8 Test: a missing record does not crash and results in re-offering the file
 
 ## 5. Readiness detection
 
-- [ ] 5.1 Implement stability polling on length and last-write time across consecutive checks
-- [ ] 5.2 Add a read-only open as secondary confirmation, not as the primary signal
-- [ ] 5.3 Implement the readiness timeout, after which the file is abandoned and reported
-- [ ] 5.4 Verify no code path depends on acquiring an exclusive lock
-- [ ] 5.5 Test: a file growing over several intervals is not read until it stops
-- [ ] 5.6 Test: a file complete on arrival is processed after the quiet interval
-- [ ] 5.7 Test: a file that never stabilises is abandoned with a logged reason and no upload
+- [x] 5.1 Implement stability polling on length and last-write time across consecutive checks
+- [x] 5.2 Add a read-only open as secondary confirmation, not as the primary signal
+- [x] 5.3 Implement the readiness timeout, after which the file is abandoned and reported
+- [x] 5.4 Verify no code path depends on acquiring an exclusive lock
+- [x] 5.5 Test: a file growing over several intervals is not read until it stops
+- [x] 5.6 Test: a file complete on arrival is processed after the quiet interval
+- [x] 5.7 Test: a file that never stabilises is abandoned with a logged reason and no upload
 
 ## 6. Pipeline
 
