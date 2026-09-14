@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
-using WahooFitToGarmin.Tests.Fakes;
+using WahooFitToGarmin.Tests.Mocks;
 
 using WahooFitToGarmin_Desktop.Core.Activities;
 using WahooFitToGarmin_Desktop.Core.GARMIN;
@@ -15,13 +15,13 @@ namespace WahooFitToGarmin.Tests;
 [TestClass]
 public sealed class GarminSessionTests
 {
-    private static FakeSettingsStore Configured() =>
-        new(new UserSettings
+    private static ISettingsStore Configured() =>
+        MockBuilders.SettingsStore(new UserSettings
         {
             WatchedFolder = "/watched",
             GarminLogin = "rider@example.com",
             GarminPassword = "secret",
-        });
+        }).Object;
 
     private static Mock<IClient> ClientThat(bool valid, bool authenticates = true)
     {
@@ -104,7 +104,7 @@ public sealed class GarminSessionTests
     [TestMethod]
     public async Task MissingCredentials_ReportSignInRequired_NotATransientFailure()
     {
-        var settings = new FakeSettingsStore(new UserSettings { WatchedFolder = "/watched" });
+        var settings = MockBuilders.SettingsStore(new UserSettings { WatchedFolder = "/watched" }).Object;
         var (session, factory) = Create(settings, ClientThat(valid: false).Object);
 
         var result = await session.GetAsync(CancellationToken.None);

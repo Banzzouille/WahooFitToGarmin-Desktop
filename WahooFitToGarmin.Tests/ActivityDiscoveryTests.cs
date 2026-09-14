@@ -3,48 +3,24 @@ using System.Text;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using WahooFitToGarmin.Tests.Fakes;
+using Moq;
+
+using WahooFitToGarmin.Tests.Mocks;
 
 using WahooFitToGarmin_Desktop.Core.Activities;
+using WahooFitToGarmin_Desktop.Core.Platform;
 using WahooFitToGarmin_Desktop.Core.Settings;
 
 namespace WahooFitToGarmin.Tests;
-
-internal sealed class FakeWatcher : IFolderWatcher
-{
-    public event Action<string>? FileAppeared;
-
-    public List<string> Watched { get; } = [];
-
-    public int StopCalls { get; private set; }
-
-    public string? CurrentFolder { get; private set; }
-
-    public void Watch(string folderPath)
-    {
-        Watched.Add(folderPath);
-        CurrentFolder = folderPath;
-    }
-
-    public void Stop()
-    {
-        StopCalls++;
-        CurrentFolder = null;
-    }
-
-    public void Raise(string path) => FileAppeared?.Invoke(path);
-
-    public void Dispose() => Stop();
-}
 
 [TestClass]
 public sealed class ActivityDiscoveryTests
 {
     private string _folder = null!;
-    private FakeFileStore _files = null!;
-    private FakeWatcher _watcher = null!;
-    private FakeSettingsStore _settings = null!;
-    private FakeNotifier _notifier = null!;
+    private ActivityFiles _files = null!;
+    private Mock<IFolderWatcher> _watcher = null!;
+    private Mock<ISettingsStore> _settings = null!;
+    private Mock<INotifier> _notifier = null!;
 
     [TestInitialize]
     public void Setup()
@@ -54,10 +30,10 @@ public sealed class ActivityDiscoveryTests
         _folder = Path.Combine(Path.GetTempPath(), "wftg-discovery", Guid.NewGuid().ToString("n"));
         Directory.CreateDirectory(_folder);
 
-        _files = new FakeFileStore();
-        _watcher = new FakeWatcher();
-        _settings = new FakeSettingsStore(new UserSettings { WatchedFolder = _folder });
-        _notifier = new FakeNotifier();
+        _files = new ActivityFiles();
+        _watcher = MockBuilders.Watcher();
+        _settings = MockBuilders.SettingsStore(new UserSettings { WatchedFolder = _folder });
+        _notifier = MockBuilders.Notifier();
     }
 
     [TestCleanup]
@@ -69,19 +45,23 @@ public sealed class ActivityDiscoveryTests
         }
     }
 
-    private (ActivityDiscovery Discovery, ActivityPipeline Pipeline, FakeUploader Uploader) Create(
-        IProcessedActivityRecord record)
+    private (ActivityDiscovery Discovery, ActivityPipeline Pipeline, Mock<IActivityUploader> Uploader) Create(
+        Mock<IProcessedActivityRecord> record)
     {
-        var uploader = new FakeUploader(UploadOutcome.Success());
+        var uploader = MockBuilders.Uploader(UploadOutcome.Success());
+        var probe = MockBuilders.StableProbe(_files);
+        var fileStore = MockBuilders.FileStore(_files);
+
         var readiness = new FileReadinessWaiter(
-            _files, NullLogger.Instance, TimeSpan.Zero, requiredStableChecks: 1);
+            probe.Object, NullLogger.Instance, TimeSpan.Zero, requiredStableChecks: 1);
 
         var pipeline = new ActivityPipeline(
-            _settings, record, uploader, [], _files, readiness, _files,
-            NullLogger.Instance, null, (_, _) => Task.CompletedTask);
+            _settings.Object, record.Object, uploader.Object, [], probe.Object, readiness,
+            fileStore.Object, NullLogger.Instance, null, (_, _) => Task.CompletedTask);
 
         var discovery = new ActivityDiscovery(
-            _settings, record, _files, _watcher, pipeline, _notifier, NullLogger.Instance);
+            _settings.Object, record.Object, fileStore.Object, _watcher.Object, pipeline,
+            _notifier.Object, NullLogger.Instance);
 
         return (discovery, pipeline, uploader);
     }
@@ -107,7 +87,7 @@ public sealed class ActivityDiscoveryTests
         }
     }
 
-    /// <summary>Puts a real file on disk and registers it with the fake store.</summary>
+    /// <summary>Puts a real file on disk and registers its content in memory.</summary>
     private string AddFile(string name, string content)
     {
         var path = Path.Combine(_folder, name);
@@ -116,20 +96,30 @@ public sealed class ActivityDiscoveryTests
         return path;
     }
 
+    /// <summary>Raises the watcher's event, as the real watcher would.</summary>
+    private void RaiseFileAppeared(string path) => _watcher.Raise(x => x.FileAppeared += null, path);
+
+    private static void VerifyNoUpload(Mock<IActivityUploader> uploader, string because) =>
+        uploader.Verify(
+            x => x.UploadAsync(It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never,
+            because);
+
     [TestMethod]
     public void FirstRun_BaselinesExistingFilesWithoutUploadingThem()
     {
         AddFile("old-1.fit", "one");
         AddFile("old-2.fit", "two");
 
-        var record = new FakeRecord(isFirstRun: true);
+        var record = MockBuilders.Record(isFirstRun: true);
         var (discovery, pipeline, uploader) = Create(record);
 
         discovery.Start();
 
-        Assert.AreEqual(0, uploader.Attempts, "existing files were uploaded on the first run");
-        Assert.AreEqual(2, record.Entries.Count);
-        Assert.IsTrue(record.Entries.Values.All(o => o == ActivityOutcome.Baseline));
+        VerifyNoUpload(uploader, "existing files were uploaded on the first run");
+        record.Verify(
+            x => x.MarkBaseline(It.Is<IReadOnlyCollection<(string, string)>>(e => e.Count == 2)),
+            Times.Once);
         Assert.AreEqual(0, pipeline.Counters.Processed);
     }
 
@@ -138,13 +128,14 @@ public sealed class ActivityDiscoveryTests
     {
         AddFile("new.fit", "new ride");
 
-        var record = new FakeRecord(isFirstRun: false);
-        var (discovery, pipeline, uploader) = Create(record);
+        var (discovery, pipeline, uploader) = Create(MockBuilders.Record(isFirstRun: false));
 
         discovery.Start();
         await DrainAsync(pipeline, expected: 1);
 
-        Assert.AreEqual(1, uploader.Attempts);
+        uploader.Verify(
+            x => x.UploadAsync(It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Once);
         Assert.AreEqual(1, pipeline.Counters.Processed);
     }
 
@@ -153,16 +144,18 @@ public sealed class ActivityDiscoveryTests
     {
         var path = AddFile("ride.fit", "ride");
 
-        var record = new FakeRecord(isFirstRun: false);
-        var (discovery, pipeline, uploader) = Create(record);
+        var (discovery, pipeline, uploader) = Create(MockBuilders.Record(isFirstRun: false));
 
         discovery.Start();
-        _watcher.Raise(path);
+        RaiseFileAppeared(path);
 
         await DrainAsync(pipeline, expected: 1);
         await Task.Delay(50, CancellationToken.None);
 
-        Assert.AreEqual(1, uploader.Attempts, "the same file was uploaded twice");
+        uploader.Verify(
+            x => x.UploadAsync(It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Once,
+            "the same file was uploaded twice");
     }
 
     [TestMethod]
@@ -170,40 +163,40 @@ public sealed class ActivityDiscoveryTests
     {
         AddFile("ride.fit", "ride");
 
-        var (discovery, _, _) = Create(new FakeRecord(isFirstRun: false));
+        var (discovery, _, _) = Create(MockBuilders.Record(isFirstRun: false));
         discovery.Start();
 
-        CollectionAssert.Contains(_watcher.Watched, _folder);
+        _watcher.Verify(x => x.Watch(_folder), Times.Once);
     }
 
     [TestMethod]
     public void NoConfiguredFolder_IsReportedAndDoesNotThrow()
     {
-        _settings.Update(s => s with { WatchedFolder = null });
+        _settings.Object.Update(s => s with { WatchedFolder = null });
 
-        var (discovery, _, _) = Create(new FakeRecord(isFirstRun: false));
+        var (discovery, _, _) = Create(MockBuilders.Record(isFirstRun: false));
 
         discovery.Start();
 
-        Assert.AreEqual(0, _watcher.Watched.Count);
+        _watcher.Verify(x => x.Watch(It.IsAny<string>()), Times.Never);
     }
 
     [TestMethod]
     public void AConfiguredFolderThatDoesNotExist_IsReportedAndDoesNotThrow()
     {
-        _settings.Update(s => s with { WatchedFolder = Path.Combine(_folder, "gone") });
+        _settings.Object.Update(s => s with { WatchedFolder = Path.Combine(_folder, "gone") });
 
-        var (discovery, _, _) = Create(new FakeRecord(isFirstRun: false));
+        var (discovery, _, _) = Create(MockBuilders.Record(isFirstRun: false));
 
         discovery.Start();
 
-        Assert.AreEqual(0, _watcher.Watched.Count);
+        _watcher.Verify(x => x.Watch(It.IsAny<string>()), Times.Never);
     }
 
     [TestMethod]
     public void ChangingTheWatchedFolder_MovesTheWatcherWithoutARestart()
     {
-        var (discovery, _, _) = Create(new FakeRecord(isFirstRun: false));
+        var (discovery, _, _) = Create(MockBuilders.Record(isFirstRun: false));
         discovery.Start();
 
         var second = Path.Combine(Path.GetTempPath(), "wftg-discovery", Guid.NewGuid().ToString("n"));
@@ -211,10 +204,9 @@ public sealed class ActivityDiscoveryTests
 
         try
         {
-            _settings.Update(s => s with { WatchedFolder = second });
+            _settings.Object.Update(s => s with { WatchedFolder = second });
 
-            Assert.AreEqual(second, _watcher.CurrentFolder);
-            CollectionAssert.Contains(_watcher.Watched, second);
+            _watcher.Verify(x => x.Watch(second), Times.Once);
         }
         finally
         {
@@ -225,42 +217,45 @@ public sealed class ActivityDiscoveryTests
     [TestMethod]
     public void SupplyingAMissingFolderLater_StartsWatchingImmediately()
     {
-        _settings.Update(s => s with { WatchedFolder = null });
+        _settings.Object.Update(s => s with { WatchedFolder = null });
 
-        var (discovery, _, _) = Create(new FakeRecord(isFirstRun: false));
+        var (discovery, _, _) = Create(MockBuilders.Record(isFirstRun: false));
         discovery.Start();
-        Assert.AreEqual(0, _watcher.Watched.Count);
+        _watcher.Verify(x => x.Watch(It.IsAny<string>()), Times.Never);
 
-        _settings.Update(s => s with { WatchedFolder = _folder });
+        _settings.Object.Update(s => s with { WatchedFolder = _folder });
 
-        CollectionAssert.Contains(_watcher.Watched, _folder);
+        _watcher.Verify(x => x.Watch(_folder), Times.Once);
     }
 
     [TestMethod]
     public async Task AFileRaisedByTheWatcher_IsProcessed()
     {
-        var record = new FakeRecord(isFirstRun: false);
-        var (discovery, pipeline, uploader) = Create(record);
+        var (discovery, pipeline, uploader) = Create(MockBuilders.Record(isFirstRun: false));
         discovery.Start();
 
         var path = AddFile("later.fit", "later ride");
-        _watcher.Raise(path);
+        RaiseFileAppeared(path);
 
         await DrainAsync(pipeline, expected: 1);
 
-        Assert.AreEqual(1, uploader.Attempts);
+        uploader.Verify(
+            x => x.UploadAsync(It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [TestMethod]
     public void BaselineIsEstablishedEvenWhenTheFolderIsEmpty_SoTheSecondRunScansNormally()
     {
-        var record = new FakeRecord(isFirstRun: true);
+        var record = MockBuilders.Record(isFirstRun: true);
         var (discovery, _, uploader) = Create(record);
 
         discovery.Start();
 
-        Assert.AreEqual(0, uploader.Attempts);
-        Assert.AreEqual(0, record.Entries.Count);
+        VerifyNoUpload(uploader, "an empty folder produced an upload");
+        record.Verify(
+            x => x.MarkBaseline(It.Is<IReadOnlyCollection<(string, string)>>(e => e.Count == 0)),
+            Times.Once);
     }
 
     [TestMethod]
@@ -268,32 +263,33 @@ public sealed class ActivityDiscoveryTests
     {
         AddFile("old.fit", "old");
 
-        var record = new FakeRecord(isFirstRun: true);
-        var (discovery, pipeline, uploader) = Create(record);
+        var (discovery, pipeline, uploader) = Create(MockBuilders.Record(isFirstRun: true));
         discovery.Start();
 
         // Arrives after the baseline was taken.
         var fresh = AddFile("fresh.fit", "fresh ride");
-        _watcher.Raise(fresh);
+        RaiseFileAppeared(fresh);
 
         await DrainAsync(pipeline, expected: 1);
 
-        Assert.AreEqual(1, uploader.Attempts);
-        CollectionAssert.AreEqual(Encoding.UTF8.GetBytes("fresh ride"), uploader.Uploaded.Single());
+        uploader.Verify(
+            x => x.UploadAsync(
+                It.Is<byte[]>(b => Encoding.UTF8.GetString(b) == "fresh ride"),
+                fresh,
+                It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [TestMethod]
     public void AFileDetectedByTheWatcher_RaisesANotification()
     {
-        var (discovery, _, _) = Create(new FakeRecord(isFirstRun: false));
+        var (discovery, _, _) = Create(MockBuilders.Record(isFirstRun: false));
         discovery.Start();
 
         var path = AddFile("ride.fit", "ride");
-        _watcher.Raise(path);
+        RaiseFileAppeared(path);
 
-        Assert.AreEqual(1, _notifier.Raised.Count, "no notification was raised on detection");
-        Assert.AreEqual("A new file is coming", _notifier.Raised[0].Title);
-        Assert.AreEqual("ride.fit", _notifier.Raised[0].Body);
+        _notifier.Verify(x => x.Notify("A new file is coming", "ride.fit"), Times.Once);
     }
 
     [TestMethod]
@@ -304,10 +300,10 @@ public sealed class ActivityDiscoveryTests
         AddFile("one.fit", "one");
         AddFile("two.fit", "two");
 
-        var (discovery, _, _) = Create(new FakeRecord(isFirstRun: false));
+        var (discovery, _, _) = Create(MockBuilders.Record(isFirstRun: false));
         discovery.Start();
 
-        Assert.AreEqual(0, _notifier.Raised.Count);
+        _notifier.Verify(x => x.Notify(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 
     [TestMethod]
@@ -315,9 +311,9 @@ public sealed class ActivityDiscoveryTests
     {
         AddFile("old.fit", "old");
 
-        var (discovery, _, _) = Create(new FakeRecord(isFirstRun: true));
+        var (discovery, _, _) = Create(MockBuilders.Record(isFirstRun: true));
         discovery.Start();
 
-        Assert.AreEqual(0, _notifier.Raised.Count);
+        _notifier.Verify(x => x.Notify(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 }
