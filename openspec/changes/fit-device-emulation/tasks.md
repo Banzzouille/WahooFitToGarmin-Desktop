@@ -39,7 +39,7 @@
 - [x] 4.10 Test: a sensor keeps its serial number, device index and device type
 - [x] 4.11 Test: every device record reports the emulated manufacturer and product
 - [x] 4.12 Test: creation time and every data timestamp are unchanged
-- [ ] 4.13 Test: no performance or physiological value is added or modified
+- [x] 4.13 Test: no performance or physiological value is added or modified
 - [x] 4.14 Test: a file without a creator message does not gain one
 
 ## 5. Output verification
@@ -48,41 +48,41 @@
 - [x] 5.2 Confirm the intended manufacturer, product, and serial number are present in the decoded output
 - [x] 5.3 Confirm the message inventory matches the source, allowing for an added creator message
 - [x] 5.4 Fail the transformation when verification does not hold
-- [ ] 5.5 Test: a deliberately damaged output is rejected by verification
-- [ ] 5.6 Test: verification failure prevents the bytes from being returned
+- [x] 5.5 Test: a deliberately damaged output is rejected by verification
+- [x] 5.6 Test: verification failure prevents the bytes from being returned
 
 ## 6. Pipeline integration and failure behaviour
 
 - [x] 6.1 Implement the transformation against the abstraction from `extract-platform-agnostic-core`, taking bytes and returning bytes
 - [x] 6.2 Ensure the transformation opens no file and writes no temporary file
-- [ ] 6.3 Register the transformation with the pipeline
+- [x] 6.3 Register the transformation with the pipeline
 - [x] 6.4 Skip transformation entirely when the feature is disabled
 - [x] 6.5 Pass non-activity files through unchanged and log the reason, without counting a failure
 - [x] 6.6 Skip transformation and log when the feature is enabled but the Unit ID is missing or invalid, uploading the original bytes
 - [ ] 6.7 On transformation or verification failure, report the activity as failed, retain the source file, and do not fall back to uploading the original
 - [x] 6.8 Test: disabled feature produces bytes identical to the file content
 - [ ] 6.9 Test: a non-activity file passes through and the failure count is unchanged
-- [ ] 6.10 Test: enabled with an invalid Unit ID uploads the original and does not fail
+- [x] 6.10 Test: enabled with an unresolvable device selection uploads the original and does not fail
 - [ ] 6.11 Test: a failed transformation counts a failure, retains the file, and uploads nothing
 - [ ] 6.12 Test: the source file is byte-for-byte unchanged after both success and failure
 
 ## 7. Settings
 
-- [ ] 7.1 Add the emulation toggle and the selected device to the typed settings, defaulting to disabled
-- [ ] 7.2 Resolve the stored device selection against the catalogue, treating an unknown identifier as emulation disabled
-- [ ] 7.3 Confirm an upgrading user's settings default to disabled
-- [ ] 7.4 Test: a selected device is persisted and resolved on restart
-- [ ] 7.5 Test: an unknown device identifier resolves to no emulation rather than throwing
-- [ ] 7.6 Test: settings survive a restart
-- [ ] 7.7 Test: a settings file from a previous version yields the feature disabled
+- [x] 7.1 Add the emulation toggle and the selected device to the typed settings, defaulting to disabled
+- [x] 7.2 Resolve the stored device selection against the catalogue, treating an unknown identifier as emulation disabled
+- [x] 7.3 Confirm an upgrading user's settings default to disabled
+- [x] 7.4 Test: a selected device is persisted and resolved on restart
+- [x] 7.5 Test: an unknown device identifier resolves to no emulation rather than throwing
+- [x] 7.6 Test: settings survive a restart
+- [x] 7.7 Test: a settings file from a previous version yields the feature disabled
 
 ## 8. User interface
 
-- [ ] 8.1 Add the emulation toggle to the settings page
-- [ ] 8.2 Add the device selector, populated from the catalogue
-- [ ] 8.6 Add the text stating that exercise load is expected to appear, that recovery time is untested, and that both depend on the service's own processing
-- [ ] 8.7 Review the wording so that nothing claims enabling emulation will produce recovery time
-- [ ] 8.8 Verify the device selector and Unit ID persist across a restart
+- [x] 8.1 Add the emulation toggle to the settings page
+- [x] 8.2 Add the device selector, populated from the catalogue
+- [x] 8.6 Add the text stating that exercise load is expected to appear, that recovery time is untested, and that both depend on the service's own processing
+- [x] 8.7 Review the wording so that nothing claims enabling emulation will produce recovery time
+- [ ] 8.8 Verify the device selector persists across a restart, in the running application
 
 ## 9. End-to-end verification
 

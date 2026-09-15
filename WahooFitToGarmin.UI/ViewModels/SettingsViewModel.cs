@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using WahooFitToGarmin.UI.Models;
 using WahooFitToGarmin.UI.Services;
 
+using WahooFitToGarmin_Desktop.Core.DeviceEmulation;
 using WahooFitToGarmin_Desktop.Core.Platform;
 using WahooFitToGarmin_Desktop.Core.Settings;
 
@@ -71,6 +72,38 @@ public sealed class SettingsViewModel : ViewModelBase
             }
 
             _settings.Update(s => s with { KeepUploadedActivityFile = value });
+            OnPropertyChanged();
+        }
+    }
+
+    public IReadOnlyList<EmulatedDevice> Devices { get; } = DeviceCatalogue.All;
+
+    public bool EmulateDevice
+    {
+        get => _settings.Current.EmulateDevice;
+        set
+        {
+            if (value == _settings.Current.EmulateDevice)
+            {
+                return;
+            }
+
+            _settings.Update(s => s with { EmulateDevice = value });
+            OnPropertyChanged();
+        }
+    }
+
+    public EmulatedDevice? SelectedDevice
+    {
+        get => DeviceCatalogue.Find(_settings.Current.EmulatedDeviceId);
+        set
+        {
+            if (value?.Id == _settings.Current.EmulatedDeviceId)
+            {
+                return;
+            }
+
+            _settings.Update(s => s with { EmulatedDeviceId = value?.Id });
             OnPropertyChanged();
         }
     }

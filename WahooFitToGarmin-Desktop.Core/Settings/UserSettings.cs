@@ -25,6 +25,20 @@ namespace WahooFitToGarmin_Desktop.Core.Settings
         public string? Theme { get; init; }
 
         /// <summary>
+        /// Off by default, including for someone upgrading: a settings file
+        /// written before this feature existed yields false, so nobody's uploads
+        /// change without them asking.
+        /// </summary>
+        public bool EmulateDevice { get; init; }
+
+        /// <summary>
+        /// Stable catalogue identifier, never the display name. An identifier a
+        /// later version no longer knows means emulation does not apply, rather
+        /// than an error.
+        /// </summary>
+        public string? EmulatedDeviceId { get; init; }
+
+        /// <summary>
         /// True when the pipeline has everything it needs to run.
         /// </summary>
         public bool IsComplete =>

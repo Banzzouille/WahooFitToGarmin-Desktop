@@ -263,4 +263,94 @@ public sealed class FitDeviceEmulationTests
             reference.Count(m => m.Num == MesgNum.DeviceInfo),
             produced.Count(m => m.Num == MesgNum.DeviceInfo));
     }
+
+    // ------------------------------------------------------------ verification
+
+    [TestMethod]
+    public void AnEncoderThatLosesContentIsCaught()
+    {
+        // Proves the verification verifies. Without a test that damages the
+        // output, a check that always passes looks identical to one that works.
+        var source = Fixture(WahooExport);
+        var messages = FitCodec.Decode(source);
+
+        // Drop a hundred messages, as a broken transformation would.
+        var truncated = FitCodec.Encode(messages.Take(messages.Count - 100));
+
+        Assert.ThrowsExactly<InvalidOperationException>(
+            () => VerifyLikeTheTransformationDoes(source, truncated),
+            "verification accepted an output missing a hundred messages");
+    }
+
+    [TestMethod]
+    public void AnOutputThatDropsUnrecognisedMessagesIsCaught()
+    {
+        var source = Fixture(WahooExport);
+        var messages = FitCodec.Decode(source);
+
+        // Exactly what a decoder that ignores what it does not model would do.
+        var stripped = FitCodec.Encode(messages.Where(m => m.Name != "unknown"));
+
+        Assert.ThrowsExactly<InvalidOperationException>(
+            () => VerifyLikeTheTransformationDoes(source, stripped),
+            "verification accepted an output with Wahoo's own messages removed");
+    }
+
+    [TestMethod]
+    public void AnOutputThatIsNotAFitFileAtAllIsCaught()
+    {
+        var source = Fixture(WahooExport);
+
+        Assert.ThrowsExactly<InvalidOperationException>(
+            () => VerifyLikeTheTransformationDoes(source, [1, 2, 3, 4]),
+            "verification accepted something that is not a FIT file");
+    }
+
+    /// <summary>
+    /// Runs the transformation's own verification, reached through a
+    /// transformation whose encoding step has been replaced by the caller's
+    /// bytes.
+    /// </summary>
+    private static void VerifyLikeTheTransformationDoes(byte[] source, byte[] produced)
+    {
+        var method = typeof(FitDeviceEmulation).GetMethod(
+            "Verify",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!;
+
+        try
+        {
+            method.Invoke(null, [source, produced, DeviceCatalogue.Find("edge-1040")!, WahooExport]);
+        }
+        catch (System.Reflection.TargetInvocationException ex) when (ex.InnerException is not null)
+        {
+            throw ex.InnerException;
+        }
+    }
+
+    [TestMethod]
+    public void AFailingTransformationThrowsRatherThanReturningDamagedBytes()
+    {
+        // Not a FIT file at all: the transformation must refuse rather than
+        // hand something unusable to the uploader.
+        var notAFitFile = System.Text.Encoding.UTF8.GetBytes("this is not an activity");
+
+        Assert.ThrowsExactly<InvalidOperationException>(
+            () => Create(Settings("edge-1040")).Apply(notAFitFile, "broken.fit"));
+    }
+
+    [TestMethod]
+    public void NoPerformanceValueIsAddedOrModified()
+    {
+        var source = Fixture(WahooExport);
+        var produced = Create(Settings("edge-1040")).Apply(source, WahooExport);
+
+        static List<string> SessionFields(byte[] content) => FitCodec.Decode(content)
+            .Where(m => m.Num == MesgNum.Session)
+            .SelectMany(m => m.Fields.Select(f => $"{f.Num}={f.GetValue(0)}"))
+            .ToList();
+
+        CollectionAssert.AreEqual(
+            SessionFields(source), SessionFields(produced),
+            "the session summary was altered");
+    }
 }

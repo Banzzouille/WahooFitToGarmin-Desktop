@@ -28,6 +28,38 @@
                   IsChecked="{Binding KeepUploadedActivityFile}" />
       </StackPanel>
 
+      <TextBlock Text="Device emulation" FontSize="18" FontWeight="SemiBold" />
+      <StackPanel Spacing="8">
+        <CheckBox Content="Present activities as recorded by a Garmin device"
+                  IsChecked="{Binding EmulateDevice}" />
+
+        <ComboBox ItemsSource="{Binding Devices}"
+                  SelectedItem="{Binding SelectedDevice}"
+                  IsEnabled="{Binding EmulateDevice}"
+                  MinWidth="280">
+          <ComboBox.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding DisplayName}" />
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <!-- The honest limits, next to the setting rather than buried in the
+             documentation. Exercise load was observed; recovery time was not,
+             and claiming otherwise would generate disappointed reports. -->
+        <TextBlock TextWrapping="Wrap" Opacity="0.7" FontSize="12" MaxWidth="560">
+          Only the manufacturer and model recorded in the file are changed. Your ride,
+          its timing, and your sensors are left exactly as recorded.
+        </TextBlock>
+        <TextBlock TextWrapping="Wrap" Opacity="0.7" FontSize="12" MaxWidth="560">
+          Garmin Connect has been observed to credit an exercise load for an activity
+          uploaded this way, and to list the selected model as the recording device.
+          Recovery time is a separate matter: your watch computes it from recent
+          training, so it depends on Garmin's own processing and on your device
+          syncing afterwards. It is not something this setting can guarantee.
+        </TextBlock>
+      </StackPanel>
+
       <TextBlock Text="Garmin Connect" FontSize="18" FontWeight="SemiBold" />
       <StackPanel Spacing="6">
         <TextBlock Text="Email" />

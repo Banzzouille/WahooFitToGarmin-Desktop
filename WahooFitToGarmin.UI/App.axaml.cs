@@ -19,6 +19,7 @@ using WahooFitToGarmin.UI.ViewModels;
 using WahooFitToGarmin.UI.Views;
 
 using WahooFitToGarmin_Desktop.Core.Activities;
+using WahooFitToGarmin_Desktop.Core.DeviceEmulation;
 using WahooFitToGarmin_Desktop.Core.Contracts.Services;
 using WahooFitToGarmin_Desktop.Core.Platform;
 using WahooFitToGarmin_Desktop.Core.Services;
@@ -126,6 +127,15 @@ public partial class App : Application
             sp.GetRequiredService<IOptions<AppConfig>>().Value.SettingsFileName ?? "Settings.json"));
 
         services.AddSingleton<ThemeService>();
+
+        // Device emulation plugs into the transformation seam the pipeline
+        // created for it. Registering it is the whole integration: the pipeline
+        // applies whatever transformations are registered, and this one returns
+        // its input untouched when the feature is off.
+        services.AddSingleton<IEmulationSettings, EmulationSettings>();
+        services.AddSingleton<IActivityTransformation>(sp => new FitDeviceEmulation(
+            sp.GetRequiredService<IEmulationSettings>(),
+            sp.GetRequiredService<ILogger<FitDeviceEmulation>>()));
 
         // The activity pipeline and everything it needs.
         services.AddSingleton<IFileSystemProbe, FileSystemProbe>();
