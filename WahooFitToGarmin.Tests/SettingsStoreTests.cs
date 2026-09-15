@@ -117,20 +117,48 @@ public sealed class SettingsStoreTests
     }
 
     [TestMethod]
-    public void Migration_KeepsThePreviousFileAsABackup()
+    public void Migration_DeletesThePreviousFile()
     {
-        WriteLegacyFile("""{"GarminLogin":"rider@example.com"}""");
+        WriteLegacyFile("""{"GarminLogin":"rider@example.com","GarminPwd":"secret"}""");
 
         CreateStore();
 
-        var backup = Path.Combine(
-            _folder,
-            LegacySettingsMigration.LegacyFileName + LegacySettingsMigration.BackupSuffix);
-
-        Assert.IsTrue(File.Exists(backup), "the previous settings file was not preserved");
         Assert.IsFalse(
             File.Exists(Path.Combine(_folder, LegacySettingsMigration.LegacyFileName)),
-            "the previous file should have been moved, not copied");
+            "the previous settings file survived, and it holds a password in clear text");
+    }
+
+    [TestMethod]
+    public void Migration_LeavesNoCopyOfThePasswordAnywhereInTheFolder()
+    {
+        // The narrow assertion above would pass if the file were merely renamed.
+        // This one fails if the password survives under any name at all.
+        WriteLegacyFile("""{"GarminLogin":"rider@example.com","GarminPwd":"secret"}""");
+
+        CreateStore();
+
+        foreach (var file in Directory.EnumerateFiles(_folder))
+        {
+            var content = File.ReadAllText(file).Trim('\uFEFF');
+
+            // The store obfuscates with base64, so the readable form has to be
+            // recovered before searching it. A file that is not base64 is
+            // searched as it stands.
+            string decoded;
+            try
+            {
+                decoded = Encoding.UTF8.GetString(Convert.FromBase64String(content));
+            }
+            catch (FormatException)
+            {
+                decoded = content;
+            }
+
+            StringAssert.DoesNotMatch(
+                decoded,
+                new System.Text.RegularExpressions.Regex("secret"),
+                $"{Path.GetFileName(file)} still contains the password");
+        }
     }
 
     [TestMethod]
@@ -153,9 +181,6 @@ public sealed class SettingsStoreTests
         var store = CreateStore();
 
         Assert.IsNull(store.Current.Theme);
-        Assert.IsFalse(
-            Directory.EnumerateFiles(_folder).Any(f => f.EndsWith(LegacySettingsMigration.BackupSuffix)),
-            "a backup was created with nothing to migrate");
     }
 
     [TestMethod]

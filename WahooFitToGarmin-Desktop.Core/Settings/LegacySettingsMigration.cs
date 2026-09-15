@@ -21,13 +21,17 @@ namespace WahooFitToGarmin_Desktop.Core.Settings
     /// Carrying the old one forward would reintroduce, at the very first launch,
     /// exactly the thing that design removes. The user signs in once instead.
     ///
-    /// The original file is kept under a backup name rather than overwritten, so
-    /// that rolling back to the previous version finds its settings intact.
+    /// The original file is deleted once its values have been taken. It holds a
+    /// password in clear text — version 1.1 stored one, and the settings file is
+    /// base64 encoded rather than encrypted, which obscures nothing from anyone
+    /// who looks. Leaving it behind under a backup name would keep that password
+    /// on disk indefinitely, in a file the user does not know exists, while they
+    /// upgraded to a version that deliberately stops storing it. Rolling back is
+    /// worth less than not leaving a password lying around.
     /// </remarks>
     public static class LegacySettingsMigration
     {
         public const string LegacyFileName = "AppProperties.json";
-        public const string BackupSuffix = ".migrated.bak";
 
         /// <summary>
         /// Migrates if, and only if, the new file is absent and a legacy file is
@@ -81,16 +85,16 @@ namespace WahooFitToGarmin_Desktop.Core.Settings
             try
             {
                 fileService.Save(folderPath, settingsFileName, migrated);
-                File.Move(legacyPath, legacyPath + BackupSuffix, overwrite: true);
+                File.Delete(legacyPath);
 
                 // Saying the password was dropped matters: the user is about to
                 // be asked to sign in again and would otherwise read that as a
                 // fault rather than as the intended behaviour.
                 logger.LogInformation(
-                    "Settings migrated from the previous format; you will be asked to sign in "
-                    + "again, because this version does not keep your password on disk. The "
-                    + "original file was kept as {BackupName}",
-                    LegacyFileName + BackupSuffix);
+                    "Settings migrated from the previous format. {LegacyName} has been deleted, "
+                    + "because it held your password in clear text. You will be asked to sign in "
+                    + "again: this version does not keep a password on disk",
+                    LegacyFileName);
             }
             catch (Exception ex)
             {
