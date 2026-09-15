@@ -1,0 +1,56 @@
+# Builds and tests on both operating systems the application ships for.
+#
+# Deliberately does not package anything. This workflow runs on every push and
+# every pull request, so it is kept to the question it exists to answer: does
+# the code compile and do the tests pass, on Windows and on macOS. Packaging is
+# slower, is only wanted at release time, and lives in package.yml.
+#
+# Third-party actions are pinned to commit identifiers rather than to tags. A
+# tag can be moved to point at different code; a commit identifier cannot.
+name: CI
+
+on:
+  push:
+    branches: [main, "v2.*"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  # A newer push makes the previous run's answer irrelevant.
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # Both legs run to completion. Knowing that Windows alone is broken is
+      # more useful than being told the build failed somewhere.
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: Windows
+          - os: macos-latest
+            name: macOS
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore WahooFitToGarmin-Desktop.slnx
+
+      - name: Build
+        run: dotnet build WahooFitToGarmin-Desktop.slnx --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test WahooFitToGarmin-Desktop.slnx --configuration Release --no-build

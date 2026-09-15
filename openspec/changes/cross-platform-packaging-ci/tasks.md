@@ -15,12 +15,12 @@
 
 ## 3. Continuous integration workflow
 
-- [ ] 3.1 Add `.github/workflows/ci.yml` triggered on push and pull request
-- [ ] 3.2 Configure a matrix covering a Windows runner and a macOS runner
-- [ ] 3.3 Build the solution on both
-- [ ] 3.4 Run the tests on both, failing the workflow on any test failure
+- [x] 3.1 Add `.github/workflows/ci.yml` triggered on push and pull request
+- [x] 3.2 Configure a matrix covering a Windows runner and a macOS runner
+- [x] 3.3 Build the solution on both
+- [x] 3.4 Run the tests on both, failing the workflow on any test failure
 - [ ] 3.5 Add the format verification step
-- [ ] 3.6 Pin every third-party action to a commit identifier
+- [x] 3.6 Pin every third-party action to a commit identifier
 - [ ] 3.7 Confirm the workflow is green before anything else is added to it
 - [ ] 3.8 Verify that a deliberately broken build fails the correct leg
 - [ ] 3.9 Verify that a deliberately unformatted file fails the format step
@@ -28,9 +28,9 @@
 
 ## 4. Publish configuration
 
-- [ ] 4.1 Add publish settings to the user interface project: self-contained, single file
-- [ ] 4.2 Declare the three runtime identifiers: Windows x64, macOS Apple Silicon, macOS Intel
-- [ ] 4.3 Confirm trimming and ahead-of-time compilation are disabled
+- [x] 4.1 Add publish settings to the user interface project: self-contained, single file
+- [x] 4.2 Declare the three runtime identifiers: Windows x64, macOS Apple Silicon, macOS Intel
+- [x] 4.3 Confirm trimming and ahead-of-time compilation are disabled
 - [ ] 4.4 Wire the version so it comes from the build rather than from a checked-in literal
 - [ ] 4.5 Publish each configuration locally and confirm it produces a runnable output
 - [ ] 4.6 Launch the Windows output on a machine with no .NET runtime installed
@@ -57,16 +57,16 @@
 
 ## 7. Release workflow
 
-- [ ] 7.1 Add `.github/workflows/release.yml` triggered by a version tag
-- [ ] 7.2 Build the Windows artefact on a Windows runner
-- [ ] 7.3 Build, bundle, and sign the macOS artefacts on a macOS runner
-- [ ] 7.4 Stamp the version from the tag into the artefacts
-- [ ] 7.5 Name each artefact so its operating system and architecture are unambiguous
+- [~] 7.1 Add `.github/workflows/package.yml`, run manually rather than triggered by a tag, because releases are made by hand
+- [x] 7.2 Build the Windows artefact on a Windows runner
+- [x] 7.3 Build, bundle, and sign the macOS artefacts on a macOS runner
+- [x] 7.4 Stamp the version into the artefact names, read from the csproj rather than from a tag, since there is no tag trigger
+- [x] 7.5 Name each artefact so its operating system and architecture are unambiguous
 - [ ] 7.6 Generate a checksum file covering every artefact
-- [ ] 7.7 Create the release and attach the artefacts and the checksum file
+- [~] 7.7 Not done on purpose: the release is created by hand, so the workflow uploads artefacts and keeps a read-only token
 - [ ] 7.8 Include the macOS first-launch instructions in the release notes
 - [ ] 7.9 Include a note that the download is large because no runtime install is required
-- [ ] 7.10 Pin every third-party action used here to a commit identifier
+- [x] 7.10 Pin every third-party action used here to a commit identifier
 
 ## 8. Dependency updates
 

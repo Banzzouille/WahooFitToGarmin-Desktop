@@ -1,0 +1,100 @@
+# Produces the downloadable archives, one per operating system.
+#
+# Run manually from the Actions tab. It does not create a release and does not
+# need permission to: releases are made by hand, and this workflow only uploads
+# artefacts for you to download and attach yourself. That keeps its token
+# read-only, which is worth more than saving the attachment step.
+#
+# Both archives are self-contained. Neither machine needs .NET installed, which
+# is why they are large.
+name: Package
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    name: Windows x64
+    runs-on: windows-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Read the version
+        id: version
+        shell: pwsh
+        run: |
+          # The csproj is the single source of truth for the version. Reading it
+          # here means the archive name cannot disagree with the binary inside.
+          $xml = [xml](Get-Content WahooFitToGarmin.UI/WahooFitToGarmin.UI.csproj)
+          $version = $xml.Project.PropertyGroup.Version | Where-Object { $_ }
+          if (-not $version) { throw "no <Version> found in the UI csproj" }
+          "value=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Publish
+        run: >
+          dotnet publish WahooFitToGarmin.UI/WahooFitToGarmin.UI.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained true
+          -p:PublishSingleFile=false
+          -p:DebugType=None
+          -p:DebugSymbols=false
+          --output publish/win-x64
+
+      - name: Archive
+        shell: pwsh
+        run: Compress-Archive -Path publish/win-x64/* -DestinationPath "WahooFitToGarmin-${{ steps.version.outputs.value }}-win-x64.zip"
+
+      - name: Upload
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: WahooFitToGarmin-${{ steps.version.outputs.value }}-win-x64
+          path: WahooFitToGarmin-${{ steps.version.outputs.value }}-win-x64.zip
+          if-no-files-found: error
+
+  macos:
+    name: macOS Apple Silicon
+    runs-on: macos-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Read the version
+        id: version
+        run: |
+          version=$(sed -n 's|.*<Version>\(.*\)</Version>.*|\1|p' WahooFitToGarmin.UI/WahooFitToGarmin.UI.csproj)
+          if [ -z "$version" ]; then echo "no <Version> found in the UI csproj" >&2; exit 1; fi
+          echo "value=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Build the application bundle
+        run: ./build/macos/make-app-bundle.sh Release osx-arm64
+
+      - name: Archive
+        # ditto, not zip: it preserves the symbolic links and extended
+        # attributes inside the bundle, and leaves the ad-hoc signature intact.
+        # A plain zip produces a bundle macOS refuses to launch.
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \
+            "artifacts/macos/osx-arm64/Wahoo Fit To Garmin.app" \
+            "WahooFitToGarmin-${{ steps.version.outputs.value }}-osx-arm64.zip"
+
+      - name: Upload
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: WahooFitToGarmin-${{ steps.version.outputs.value }}-osx-arm64
+          path: WahooFitToGarmin-${{ steps.version.outputs.value }}-osx-arm64.zip
+          if-no-files-found: error
