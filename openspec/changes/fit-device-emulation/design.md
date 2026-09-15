@@ -17,7 +17,7 @@ Wahoo files also routinely carry things that are not ours to touch: device infor
 
 **Non-Goals:**
 - Injecting training load, training effect, or recovery values into the file. Garmin ignores them and computes its own.
-- Generating or guessing Unit IDs. The mapping to device models is proprietary; a fabricated value is not equivalent to a real one.
+- Inventing identity beyond the manufacturer and product. Serial numbers, timestamps, device indexes and sensor records are passed through as recorded.
 - Emulating a device the user does not own. The feature exists so that a user's own activities are attributed to their own device.
 - Rewriting sensor attribution. Paired sensors stay as recorded.
 - Supporting FIT files that are not activities.
@@ -34,31 +34,78 @@ The cost of that choice is the risk of losing content the decoder does not under
 
 ### D2 — Exactly three messages are targeted
 
-**File identifier** — manufacturer set to Garmin, product set to the selected device's identifier, serial number set to the user's Unit ID. The creation timestamp and the file type are left alone: the timestamp is the activity's identity in Garmin Connect, and changing it would move the activity in time.
+This was written before any real file had been examined, and two of its three
+parts were wrong. What follows is what the evidence supports.
 
-**File creator** — software and hardware version, taken from the catalogue entry. Added if the file does not already carry this message.
+**File identifier** — manufacturer set to Garmin and product set to the selected
+device's identifier. The serial number, the creation timestamp and the file type
+are left alone. The timestamp is the activity's identity in the service and
+changing it would move the activity in time; the serial number is discussed in
+D5, where the original decision is reversed.
 
-**Device information, the record describing the recording device itself** — manufacturer, product, serial number, and software version, made consistent with the file identifier.
+**Device information, every record** — manufacturer and product set to the same
+values as the file identifier. Serial numbers, device indexes, device types and
+source types are left untouched. See D3, where that decision is also reversed.
 
-Nothing else is touched: sessions, laps, records, events, heart rate variability, and the activity message are all passed through.
+**File creator** — not added. The working conversion carried no such message and
+the service accepted the file, so adding one would be inventing a requirement.
+Where the source already has one it is passed through unchanged.
 
-### D3 — Only the recording device's information record is rewritten
+Nothing else is touched: sessions, laps, records, events, heart rate variability,
+and the activity message are all passed through.
 
-A Wahoo file typically contains several device information records: one for the head unit, and one for each paired sensor. Rewriting all of them would claim that the user's heart rate strap and power meter are also Garmin devices, which is false, breaks sensor attribution in Garmin Connect, and was never the point.
+### D3 — Every device information record is rewritten, reversing an earlier decision
 
-Only the record describing the recording device is modified. Sensor records are passed through untouched.
+This decision previously said the opposite: only the recording device would be
+touched, because claiming that a user's heart rate strap and power meter are
+Garmin devices is false and would break sensor attribution.
 
-### D4 — The serial number is identical everywhere it appears
+The reasoning was sound and the conclusion was wrong. A conversion of a real ride
+that the service accepted — and that produced an exercise load, confirmed by the
+file's owner in Garmin Connect — rewrote manufacturer and product on all eighty
+four device records, the power meter among them. Its serial numbers, indexes and
+device types were left alone.
 
-The file identifier and the recording device's information record must carry the same serial number. An inconsistency there is exactly the kind of thing a server-side validator notices, and it would produce a rejection whose message explains nothing.
+Reproducing a configuration known to work beats improving on one that has never
+been tried. The narrower approach may well work too; nobody has demonstrated it,
+and this feature is not the place to find out at a user's expense.
 
-One value, written in both places, from one source.
+What stays untouched inside those records still matters: serial numbers, device
+indexes, device types and source types are preserved, so the file continues to
+say that a power meter was present and which one, by its own serial.
 
-### D5 — Unit ID validation is format-only, and the interface says so
+### D4 — Serial numbers are not touched, so they stay consistent by construction
 
-The Unit ID is a 32-bit number, and zero means "absent" in the FIT specification. Validation therefore checks that the value is numeric, in range, and not zero.
+The original decision was about writing one Unit ID into both the file identifier
+and the device record without them drifting apart. With D5 reversed there is
+nothing to write: every serial number in the file is the one the recording device
+put there, and they remain as consistent with each other as they were.
 
-It cannot check anything else. Whether the Unit ID belongs to a device of the selected model is knowable only to Garmin, since the mapping is proprietary. The interface states this rather than implying a validated field: an accepted Unit ID means well-formed, not correct.
+Which is the stronger position anyway. The previous plan would have made the file
+identifier claim one serial while eighty four device records claimed another,
+unless every one of them were rewritten too.
+
+### D5 — No Unit ID. The original serial number is kept
+
+This reverses the most demanding part of the original design, and the feature is
+much better for it.
+
+The plan required the user to find and enter their Garmin device's Unit ID, on
+the strength of research saying the service checks the serial number against the
+device model. The interface would have had a mandatory field, format-only
+validation, and a paragraph explaining where to find the value and why the
+application could not verify it.
+
+The working conversion kept the Wahoo unit's own serial number — 2519185680 —
+and the service still produced an exercise load. The requirement was not real.
+
+So the serial number is passed through untouched. There is no Unit ID field, no
+validation, no guidance to write, and nothing for a user to get wrong. The
+feature reduces to choosing a device from a list.
+
+This also removes the one part of the design that was uncomfortable: asking
+someone to type an identifier belonging to hardware they own, into a file
+claiming to be from that hardware.
 
 ### D6 — Unknown and developer content is preserved, or the transformation fails
 
@@ -90,9 +137,14 @@ A file that is a FIT file but not an activity — a course, a settings export, a
 
 ### D11 — Inconsistent settings degrade to disabled
 
-If the feature is switched on but no valid Unit ID is stored, the transformation is skipped, the condition is logged, and the upload proceeds with the original bytes. The user's activities keep reaching Garmin Connect; only the attribution is missing.
+If the feature is switched on but the stored device identifier names nothing in
+the catalogue — an entry removed by a later version, for instance — the
+transformation is skipped, the condition is logged, and the upload proceeds with
+the original bytes. The user's activities keep reaching the service; only the
+attribution is missing.
 
-Blocking uploads over a configuration problem would punish the user for the feature they opted into.
+Blocking uploads over a configuration problem would punish the user for the
+feature they opted into.
 
 ### D12 — The transformation is pure and works in memory
 
@@ -106,9 +158,19 @@ It takes bytes and returns bytes. It opens no file, writes no temporary file, an
 
 **Garmin stops honouring device identity, or tightens validation** → The feature degrades to cosmetic: activities still upload, they simply stop being credited the way the user hoped. Nothing breaks. This is why the interface states what depends on Garmin's processing.
 
-**A user enters a Unit ID that is not theirs** → Not technically detectable, since format-only validation is all that is possible. The documentation states that this is for attributing your own activities to your own device, and the honest framing is the control, because there is no other one.
+**The feature presents a ride as recorded by hardware the user does not own** →
+Nothing here fabricates an identity: the serial number in the file stays the one
+the recording device wrote. What changes is the manufacturer and product, which
+is the point of the feature. The documentation says plainly what is rewritten.
 
-**Expectations exceed what the feature delivers** → The most likely disappointment is recovery time not appearing, because it is computed on the watch and needs physiological synchronisation and a device sync afterwards. Stating this in the interface, next to the setting, is part of the change rather than a documentation afterthought.
+**Expectations exceed what the feature delivers** → Exercise load is confirmed to
+appear: the owner of the reference conversion saw it in Garmin Connect, with the
+emulated model shown as the recording device. Recovery time did not appear, but
+that file was three years old, and recovery time is a forward-looking figure the
+watch computes from recent training — an old activity could not produce one
+whatever the file said. So the honest position is that load is demonstrated,
+recovery time is untested, and the interface says so next to the setting rather
+than implying both.
 
 **Emulation changes what a duplicate looks like to Garmin** → The pipeline's own duplicate protection is keyed on the source file's content, which the transformation never alters, so re-offering the same file is still recognised locally. Garmin's own duplicate detection sees modified bytes and may or may not match; the pipeline already treats a duplicate report as a normal outcome either way.
 
@@ -122,8 +184,8 @@ Branch `feat/fit-device-emulation`.
 4. Implement the recording-device-only rule for device information records.
 5. Implement output verification by re-decoding.
 6. Implement the pass-through cases: non-activity files, feature disabled, settings inconsistent.
-7. Add the settings: toggle, device selection, Unit ID, with format validation.
-8. Add the settings page fields, the guidance on where to find the Unit ID, and the text stating what Garmin does and does not compute.
+7. Add the settings: toggle and device selection.
+8. Add the settings page fields and the text stating what the service does and does not compute.
 9. Register the transformation with the pipeline.
 10. Verify end to end: upload an emulated activity and confirm in Garmin Connect that it is attributed to the selected device.
 
