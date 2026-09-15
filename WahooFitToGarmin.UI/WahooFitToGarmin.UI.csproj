@@ -6,7 +6,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>WahooFitToGarmin.UI</RootNamespace>
     <AssemblyName>WahooFitToGarmin</AssemblyName>
-    <Version>1.1.0</Version>
+    <Version>2.0.0</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationIcon>Assets/garmin-wahoo-logo.ico</ApplicationIcon>

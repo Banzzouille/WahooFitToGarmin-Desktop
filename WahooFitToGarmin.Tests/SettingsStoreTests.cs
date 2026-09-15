@@ -98,7 +98,7 @@ public sealed class SettingsStoreTests
     }
 
     [TestMethod]
-    public void Migration_CarriesEveryValueFromThePreviousVersion()
+    public void Migration_CarriesEveryValueWorthCarrying()
     {
         // Note the unquoted boolean: that is how version 1.1.0 wrote it.
         WriteLegacyFile(
@@ -108,7 +108,10 @@ public sealed class SettingsStoreTests
 
         Assert.AreEqual(@"D:\Dropbox\Wahoo", store.Current.WatchedFolder);
         Assert.AreEqual("rider@example.com", store.Current.GarminLogin);
-        Assert.AreEqual("secret", store.Current.GarminPassword);
+        Assert.AreNotEqual(
+            "secret",
+            store.Current.GarminPassword,
+            "the stored password was carried forward, which this version must not do");
         Assert.IsTrue(store.Current.KeepUploadedActivityFile);
         Assert.AreEqual("Light", store.Current.Theme);
     }

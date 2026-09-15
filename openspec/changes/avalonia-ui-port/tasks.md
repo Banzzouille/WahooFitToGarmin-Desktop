@@ -92,14 +92,14 @@
 ## 9. Tray and lifecycle
 
 - [ ] 9.1 Produce a monochrome template PNG asset for the macOS menu bar; keep the coloured icon for Windows
-- [ ] 9.2 Add the `TrayIcon` with the per-platform asset
-- [ ] 9.3 Add the tray menu with open and quit entries
+- [x] 9.2 Add the `TrayIcon` with the per-platform asset
+- [x] 9.3 Add the tray menu with open and quit entries
 - [ ] 9.4 Cancel the main window closing event and hide the window instead
 - [ ] 9.5 Make quit the only path that terminates the process, persisting settings on the way out
 - [ ] 9.6 Implement the single-instance guard: named mutex on Windows, lock file or local socket on macOS
 - [ ] 9.7 Make the second instance signal the first to show its window, then exit
 - [ ] 9.8 Release the guard on exit so a subsequent launch starts normally
-- [ ] 9.9 Verify the tray icon appears on Windows and the menu works
+- [x] 9.9 Verify the tray icon appears on Windows and the menu works
 - [ ] 9.10 Verify the menu bar icon appears on macOS and remains legible in light and dark appearance
 - [ ] 9.11 Verify closing the window hides it and the process keeps running
 - [ ] 9.12 Verify a file dropped while hidden is still detected and uploaded

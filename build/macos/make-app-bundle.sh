@@ -37,7 +37,14 @@ dotnet publish "$PROJECT" \
 say "Assembling the bundle"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
-cp "$ROOT/build/macos/Info.plist" "$APP/Contents/Info.plist"
+# The version lives in the csproj and nowhere else. Substituting it here means
+# the bundle cannot quietly disagree with the binary it wraps.
+VERSION=$(sed -n 's|.*<Version>\(.*\)</Version>.*|\1|p' "$ROOT/WahooFitToGarmin.UI/WahooFitToGarmin.UI.csproj")
+if [ -z "$VERSION" ]; then
+    echo "  could not read <Version> from the UI csproj" >&2
+    exit 1
+fi
+sed "s/__VERSION__/$VERSION/g" "$ROOT/build/macos/Info.plist" > "$APP/Contents/Info.plist"
 cp "$ROOT/WahooFitToGarmin.UI/Assets/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
 cp -R "$STAGING/publish/." "$APP/Contents/MacOS/"
 

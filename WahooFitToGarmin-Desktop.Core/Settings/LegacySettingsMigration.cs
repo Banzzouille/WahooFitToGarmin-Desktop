@@ -12,8 +12,14 @@ namespace WahooFitToGarmin_Desktop.Core.Settings
     /// </summary>
     /// <remarks>
     /// The previous format was the user interface's untyped property bag,
-    /// serialized and base64-wrapped. Its five keys map onto
+    /// serialized and base64-wrapped. Four of its five keys map onto
     /// <see cref="UserSettings"/> one for one.
+    ///
+    /// The fifth, the stored password, is deliberately dropped. Version 1.1
+    /// kept it on disk; this version does not, because the sign-in flow accepts
+    /// a password and exchanges it for a token without ever persisting it.
+    /// Carrying the old one forward would reintroduce, at the very first launch,
+    /// exactly the thing that design removes. The user signs in once instead.
     ///
     /// The original file is kept under a backup name rather than overwritten, so
     /// that rolling back to the previous version finds its settings intact.
@@ -67,7 +73,6 @@ namespace WahooFitToGarmin_Desktop.Core.Settings
             {
                 WatchedFolder = Value(bag, "WahooDropBoxFolder"),
                 GarminLogin = Value(bag, "GarminLogin"),
-                GarminPassword = Value(bag, "GarminPwd"),
                 KeepUploadedActivityFile =
                     bool.TryParse(Value(bag, "KeepUploadedActivityFile"), out var keep) && keep,
                 Theme = Value(bag, "Theme"),
@@ -78,8 +83,13 @@ namespace WahooFitToGarmin_Desktop.Core.Settings
                 fileService.Save(folderPath, settingsFileName, migrated);
                 File.Move(legacyPath, legacyPath + BackupSuffix, overwrite: true);
 
+                // Saying the password was dropped matters: the user is about to
+                // be asked to sign in again and would otherwise read that as a
+                // fault rather than as the intended behaviour.
                 logger.LogInformation(
-                    "Settings migrated from the previous format; the original was kept as {BackupName}",
+                    "Settings migrated from the previous format; you will be asked to sign in "
+                    + "again, because this version does not keep your password on disk. The "
+                    + "original file was kept as {BackupName}",
                     LegacyFileName + BackupSuffix);
             }
             catch (Exception ex)
