@@ -422,4 +422,36 @@ public sealed class FitDeviceEmulationTests
 
         CollectionAssert.AreEqual(copy, source, "the transformation mutated its input while failing");
     }
+
+    [TestMethod]
+    public void TheEpixWritesTheProductIdentifierTheSpecificationNames()
+    {
+        // 3943 is the Epix Gen 2, and is deliberately not spelled as a literal
+        // anywhere but here: the catalogue names the specification's constant so
+        // a wrong device is a compilation error, and this asserts the constant
+        // is the one Garmin publishes.
+        var produced = Create(Settings("epix-gen2")).Apply(Fixture(WahooExport), "ride.fit");
+        var fileId = new FileIdMesg(FitCodec.Decode(produced).First(m => m.Num == MesgNum.FileId));
+
+        Assert.AreEqual(Manufacturer.Garmin, fileId.GetManufacturer());
+        Assert.AreEqual((ushort)3943, fileId.GetProduct());
+    }
+
+    [TestMethod]
+    public void EveryCatalogueEntryIsSelectableAndProducesAGarminFile()
+    {
+        // Guards the catalogue as a whole: a row added with a typo'd identifier
+        // or an unreachable one fails here rather than in a user's upload.
+        foreach (var device in DeviceCatalogue.All)
+        {
+            Assert.AreSame(device, DeviceCatalogue.Find(device.Id), $"{device.Id} does not resolve");
+
+            var fileId = new FileIdMesg(FitCodec
+                .Decode(Create(Settings(device.Id)).Apply(Fixture(WahooExport), "ride.fit"))
+                .First(m => m.Num == MesgNum.FileId));
+
+            Assert.AreEqual(Manufacturer.Garmin, fileId.GetManufacturer(), device.Id);
+            Assert.AreEqual(device.ProductId, fileId.GetProduct(), device.DisplayName);
+        }
+    }
 }

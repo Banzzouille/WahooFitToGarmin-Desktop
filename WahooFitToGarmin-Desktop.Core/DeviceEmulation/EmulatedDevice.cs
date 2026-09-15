@@ -17,15 +17,11 @@ namespace WahooFitToGarmin_Desktop.Core.DeviceEmulation
     /// name, which is free to change.</param>
     /// <param name="DisplayName">What the user picks from.</param>
     /// <param name="ProductId">The FIT product identifier.</param>
-    /// <param name="SoftwareVersion">Written into the file creator message.</param>
-    /// <param name="HardwareVersion">Written into the file creator message.</param>
     /// <param name="Kind">Watch or bike computer.</param>
     public sealed record EmulatedDevice(
         string Id,
         string DisplayName,
         ushort ProductId,
-        ushort SoftwareVersion,
-        byte HardwareVersion,
         EmulatedDeviceKind Kind);
 
     /// <summary>
@@ -39,23 +35,25 @@ namespace WahooFitToGarmin_Desktop.Core.DeviceEmulation
     /// mistake is a compilation error rather than the wrong device appearing in
     /// the service.
     ///
-    /// The software and hardware versions are cosmetic. A real device writes
-    /// them, so the file carries plausible values, but they have no known effect
-    /// on how the service processes an activity. Nobody should invest effort in
-    /// tracking real firmware releases here.
+    /// Firmware versions are deliberately absent. An earlier design carried
+    /// them, to be written into a file creator message — until the reference
+    /// conversion turned out to have no such message, so none is written and the
+    /// versions had nothing left to feed. Carrying a plausible-looking number
+    /// nothing reads is worse than carrying none.
     /// </remarks>
     public static class DeviceCatalogue
     {
         public static IReadOnlyList<EmulatedDevice> All { get; } =
         [
-            new("fenix-7", "Garmin Fenix 7", GarminProduct.Fenix7, 1600, 0, EmulatedDeviceKind.Watch),
-            new("fenix-7s", "Garmin Fenix 7S", GarminProduct.Fenix7s, 1600, 0, EmulatedDeviceKind.Watch),
-            new("fenix-7x", "Garmin Fenix 7X", GarminProduct.Fenix7x, 1600, 0, EmulatedDeviceKind.Watch),
-            new("fenix-7-pro-solar", "Garmin Fenix 7 Pro Solar", GarminProduct.Fenix7ProSolar, 1600, 0, EmulatedDeviceKind.Watch),
-            new("fenix-8", "Garmin Fenix 8", GarminProduct.Fenix8, 1300, 0, EmulatedDeviceKind.Watch),
-            new("fr-965", "Garmin Forerunner 965", GarminProduct.Fr965, 1500, 0, EmulatedDeviceKind.Watch),
-            new("edge-1040", "Garmin Edge 1040", GarminProduct.Edge1040, 1400, 0, EmulatedDeviceKind.BikeComputer),
-            new("edge-1050", "Garmin Edge 1050", GarminProduct.Edge1050, 1200, 0, EmulatedDeviceKind.BikeComputer),
+            new("fenix-7", "Garmin Fenix 7", GarminProduct.Fenix7, EmulatedDeviceKind.Watch),
+            new("fenix-7s", "Garmin Fenix 7S", GarminProduct.Fenix7s, EmulatedDeviceKind.Watch),
+            new("fenix-7x", "Garmin Fenix 7X", GarminProduct.Fenix7x, EmulatedDeviceKind.Watch),
+            new("fenix-7-pro-solar", "Garmin Fenix 7 Pro Solar", GarminProduct.Fenix7ProSolar, EmulatedDeviceKind.Watch),
+            new("fenix-8", "Garmin Fenix 8", GarminProduct.Fenix8, EmulatedDeviceKind.Watch),
+            new("epix-gen2", "Garmin Epix (Gen 2)", GarminProduct.EpixGen2, EmulatedDeviceKind.Watch),
+            new("fr-965", "Garmin Forerunner 965", GarminProduct.Fr965, EmulatedDeviceKind.Watch),
+            new("edge-1040", "Garmin Edge 1040", GarminProduct.Edge1040, EmulatedDeviceKind.BikeComputer),
+            new("edge-1050", "Garmin Edge 1050", GarminProduct.Edge1050, EmulatedDeviceKind.BikeComputer),
         ];
 
         /// <summary>
