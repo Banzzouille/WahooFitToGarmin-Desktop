@@ -353,4 +353,73 @@ public sealed class FitDeviceEmulationTests
             SessionFields(source), SessionFields(produced),
             "the session summary was altered");
     }
+
+    // ------------------------------------------------------- non-activity file
+
+    /// <summary>
+    /// Builds a valid FIT file that is not an activity — a settings file, as a
+    /// device would write. No such fixture was supplied, and constructing one is
+    /// more honest than skipping the path.
+    /// </summary>
+    private static byte[] BuildNonActivityFile()
+    {
+        var fileId = new FileIdMesg();
+        fileId.SetType(Dynastream.Fit.File.Settings);
+        fileId.SetManufacturer(Manufacturer.WahooFitness);
+        fileId.SetProduct(31);
+        fileId.SetSerialNumber(2519185680);
+        fileId.SetTimeCreated(new Dynastream.Fit.DateTime(SysDateTime.UtcNow));
+
+        return FitCodec.Encode([fileId]);
+    }
+
+    [TestMethod]
+    public void ANonActivityFileIsRecognisedAsSuch()
+    {
+        var content = BuildNonActivityFile();
+
+        var type = new FileIdMesg(FitCodec.Decode(content).First(m => m.Num == MesgNum.FileId)).GetType();
+
+        Assert.AreNotEqual(Dynastream.Fit.File.Activity, type, "the fixture is not what this test needs");
+    }
+
+    [TestMethod]
+    public void ANonActivityFilePassesThroughUnchanged()
+    {
+        // A course, a workout or a settings export is a FIT file, but emulating
+        // a recording device for it makes no sense. It is not an error either.
+        var content = BuildNonActivityFile();
+
+        var produced = Create(Settings("edge-1040")).Apply(content, "settings.fit");
+
+        Assert.AreSame(content, produced, "a non-activity file was rewritten");
+    }
+
+    [TestMethod]
+    public void ANonActivityFileKeepsItsOriginalManufacturer()
+    {
+        var content = BuildNonActivityFile();
+
+        var produced = Create(Settings("edge-1040")).Apply(content, "settings.fit");
+        var fileId = new FileIdMesg(FitCodec.Decode(produced).First(m => m.Num == MesgNum.FileId));
+
+        Assert.AreEqual(Manufacturer.WahooFitness, fileId.GetManufacturer());
+    }
+
+    [TestMethod]
+    public void TheSourceIsUntouchedWhenTheTransformationFails()
+    {
+        var source = System.Text.Encoding.UTF8.GetBytes("this is not an activity");
+        var copy = source.ToArray();
+
+        try
+        {
+            Create(Settings("edge-1040")).Apply(source, "broken.fit");
+        }
+        catch (InvalidOperationException)
+        {
+        }
+
+        CollectionAssert.AreEqual(copy, source, "the transformation mutated its input while failing");
+    }
 }

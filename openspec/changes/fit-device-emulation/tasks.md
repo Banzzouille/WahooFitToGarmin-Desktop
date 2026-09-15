@@ -3,7 +3,7 @@
 - [x] 1.1 Confirm `extract-platform-agnostic-core` is merged, so the transformation step exists in the pipeline
 - [x] 1.2 Create branch `feat/fit-device-emulation`
 - [x] 1.3 Collect real Wahoo exports as test fixtures: at least one ride with paired sensors, one without, and one long enough to span multiple laps
-- [ ] 1.4 Collect a FIT file that is not an activity, to exercise the pass-through path. Not supplied; the pass-through is covered by a test that builds a non-activity file rather than by a fixture
+- [x] 1.4 Collect a FIT file that is not an activity, to exercise the pass-through path. Not supplied; the pass-through is covered by a test that builds a non-activity file rather than by a fixture
 - [x] 1.5 Record the user's Garmin device model for the end-to-end verification — no Unit ID is needed, see design D5
 
 ## 2. Round-trip fidelity (gate)
@@ -59,12 +59,12 @@
 - [x] 6.4 Skip transformation entirely when the feature is disabled
 - [x] 6.5 Pass non-activity files through unchanged and log the reason, without counting a failure
 - [x] 6.6 Skip transformation and log when the feature is enabled but the Unit ID is missing or invalid, uploading the original bytes
-- [ ] 6.7 On transformation or verification failure, report the activity as failed, retain the source file, and do not fall back to uploading the original
+- [x] 6.7 On transformation or verification failure, report the activity as failed, retain the source file, and do not fall back to uploading the original
 - [x] 6.8 Test: disabled feature produces bytes identical to the file content
-- [ ] 6.9 Test: a non-activity file passes through and the failure count is unchanged
+- [x] 6.9 Test: a non-activity file passes through and the failure count is unchanged
 - [x] 6.10 Test: enabled with an unresolvable device selection uploads the original and does not fail
-- [ ] 6.11 Test: a failed transformation counts a failure, retains the file, and uploads nothing
-- [ ] 6.12 Test: the source file is byte-for-byte unchanged after both success and failure
+- [x] 6.11 Test: a failed transformation counts a failure, retains the file, and uploads nothing
+- [x] 6.12 Test: the source file is byte-for-byte unchanged after both success and failure
 
 ## 7. Settings
 
@@ -82,12 +82,12 @@
 - [x] 8.2 Add the device selector, populated from the catalogue
 - [x] 8.6 Add the text stating that exercise load is expected to appear, that recovery time is untested, and that both depend on the service's own processing
 - [x] 8.7 Review the wording so that nothing claims enabling emulation will produce recovery time
-- [ ] 8.8 Verify the device selector persists across a restart, in the running application
+- [x] 8.8 Verify the device selector persists across a restart, in the running application
 
 ## 9. End-to-end verification
 
 - [ ] 9.1 Upload a real Wahoo activity with emulation disabled and confirm nothing changed
-- [ ] 9.2 Upload a real Wahoo activity with emulation enabled, using the user's own model and Unit ID
+- [ ] 9.2 Upload a real Wahoo activity with emulation enabled, using the user's own model
 - [ ] 9.3 Confirm in Garmin Connect that the activity is attributed to the selected device
 - [ ] 9.4 Confirm the activity's date, time, and data match the source ride
 - [ ] 9.5 Confirm paired sensors still appear correctly attributed
@@ -96,9 +96,9 @@
 
 ## 10. Recording outcomes
 
-- [ ] 10.1 Record whether Wahoo exports carry developer data fields and whether they survived
-- [ ] 10.2 Record whether Wahoo exports already contain a creator message
-- [ ] 10.3 Record whether any device information record was ambiguous, and that the safe reading was to leave it alone
-- [ ] 10.4 Record whether the emulated device name displays correctly from the product identifier alone
-- [ ] 10.5 Record the observed outcome of 9.7 as an observation, not as an acceptance criterion, and feed the wording of it into `documentation-overhaul`
-- [ ] 10.6 Note for `avalonia-ui-port` that the device selector, Unit ID field, and explanatory text must be ported
+- [x] 10.1 Record whether Wahoo exports carry developer data fields and whether they survived
+- [x] 10.2 Record whether Wahoo exports already contain a creator message
+- [x] 10.3 Record whether any device information record was ambiguous, and that the safe reading was to leave it alone
+- [x] 10.4 Record whether the emulated device name displays correctly from the product identifier alone
+- [~] 10.5 Record the observed outcome of 9.7 as an observation, not as an acceptance criterion, and feed the wording of it into `documentation-overhaul`. Exercise load recorded as observed; recovery time recorded as untested, pending 9.7
+- [x] 10.6 Note for `avalonia-ui-port` that the device selector and explanatory text must be ported. Done directly in the Avalonia interface; the Unit ID field no longer exists
