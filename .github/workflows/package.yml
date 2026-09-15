@@ -5,8 +5,9 @@
 # artefacts for you to download and attach yourself. That keeps its token
 # read-only, which is worth more than saving the attachment step.
 #
-# Both archives are self-contained. Neither machine needs .NET installed, which
-# is why they are large.
+# Three archives: Windows x64, macOS Apple Silicon, macOS Intel. All are
+# self-contained, so no machine needs .NET installed, which is why they are
+# large.
 name: Package
 
 on:
@@ -62,8 +63,16 @@ jobs:
           if-no-files-found: error
 
   macos:
-    name: macOS Apple Silicon
+    name: ${{ matrix.name }}
     runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runtime: osx-arm64
+            name: macOS Apple Silicon
+          - runtime: osx-x64
+            name: macOS Intel
     steps:
       - name: Check out
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -81,7 +90,11 @@ jobs:
           echo "value=$version" >> "$GITHUB_OUTPUT"
 
       - name: Build the application bundle
-        run: ./build/macos/make-app-bundle.sh Release osx-arm64
+        # Both architectures are built on the same runner. Publishing for an
+        # architecture the runner does not have is a cross-compile, and ad-hoc
+        # signing does not execute the binary, so neither step needs an Intel
+        # machine.
+        run: ./build/macos/make-app-bundle.sh Release ${{ matrix.runtime }}
 
       - name: Archive
         # ditto, not zip: it preserves the symbolic links and extended
@@ -89,12 +102,12 @@ jobs:
         # A plain zip produces a bundle macOS refuses to launch.
         run: |
           ditto -c -k --sequesterRsrc --keepParent \
-            "artifacts/macos/osx-arm64/Wahoo Fit To Garmin.app" \
-            "WahooFitToGarmin-${{ steps.version.outputs.value }}-osx-arm64.zip"
+            "artifacts/macos/${{ matrix.runtime }}/Wahoo Fit To Garmin.app" \
+            "WahooFitToGarmin-${{ steps.version.outputs.value }}-${{ matrix.runtime }}.zip"
 
       - name: Upload
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: WahooFitToGarmin-${{ steps.version.outputs.value }}-osx-arm64
-          path: WahooFitToGarmin-${{ steps.version.outputs.value }}-osx-arm64.zip
+          name: WahooFitToGarmin-${{ steps.version.outputs.value }}-${{ matrix.runtime }}
+          path: WahooFitToGarmin-${{ steps.version.outputs.value }}-${{ matrix.runtime }}.zip
           if-no-files-found: error

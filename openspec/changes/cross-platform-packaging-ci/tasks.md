@@ -29,7 +29,7 @@
 ## 4. Publish configuration
 
 - [x] 4.1 Add publish settings to the user interface project: self-contained, single file
-- [x] 4.2 Declare the three runtime identifiers: Windows x64, macOS Apple Silicon, macOS Intel
+- [x] 4.2 Declare the three runtime identifiers: Windows x64, macOS Apple Silicon, macOS Intel. All three are produced by the packaging workflow
 - [x] 4.3 Confirm trimming and ahead-of-time compilation are disabled
 - [ ] 4.4 Wire the version so it comes from the build rather than from a checked-in literal
 - [ ] 4.5 Publish each configuration locally and confirm it produces a runnable output
