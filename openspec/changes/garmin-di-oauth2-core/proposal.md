@@ -66,7 +66,7 @@ This change is gated on manual validation. The endpoints and client identifiers 
 - No password is stored anywhere, and any previously stored copy is removed.
 
 **Downstream changes**
-The README's security section becomes factually wrong the moment this ships, which `documentation-overhaul` corrects. The previously planned `webview-login-capture` change is cancelled: it existed only to avoid a manual ticket-copying step that this flow removes entirely.
+The README's security section becomes factually wrong the moment this ships, which `documentation-overhaul` corrects. The separate `webview-login-capture` change stays cancelled, but the web view itself is not: D2 makes Garmin's own page the primary sign-in path, built here rather than in a change of its own, with the programmatic post kept as a fallback.
 
 **Prior art**
 The flow is reconstructed from `ulfdalen/scalebridge-sync` (MIT) and, upstream of it, `cyberjunky/python-garminconnect`. Attribution belongs in the source file that implements it.

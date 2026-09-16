@@ -63,4 +63,4 @@ This change depends on `extract-platform-agnostic-core` having moved application
 - The Windows autostart shortcut target changes, since the executable name and layout change.
 
 **Downstream changes**
-Unblocks `cross-platform-packaging-ci`, which packages the macOS application bundle. The previously planned `webview-login-capture` change is cancelled: `garmin-di-oauth2-core` signs in programmatically, so there is no ticket for a web view to capture.
+Unblocks `cross-platform-packaging-ci`, which packages the macOS application bundle. The separate `webview-login-capture` change stays cancelled, but not for its original reason: `garmin-di-oauth2-core` D2 makes an embedded web view the primary sign-in path, so the web view is built there, beside the flow it feeds, rather than in a change of its own.

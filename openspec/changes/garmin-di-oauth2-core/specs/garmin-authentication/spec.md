@@ -2,7 +2,11 @@
 
 ### Requirement: The user signs in with their Garmin credentials
 
-The application SHALL let the user sign in by entering their Garmin email address and password. Signing in SHALL NOT require the user to visit a browser, open developer tools, or copy any value out of a network trace.
+The application SHALL let the user sign in on Garmin's own sign-in page, presented in an embedded web view. On that path the application SHALL NOT read, store, or transmit the user's password, and SHALL obtain only the service ticket resulting from a successful sign-in.
+
+The application SHALL retain a fallback in which the user enters their Garmin email address and password in the application itself, for use when the web view cannot run. Both paths SHALL produce the same session, and no part of the application beyond sign-in SHALL depend on which path produced it.
+
+Signing in SHALL NOT require the user to open developer tools or copy any value out of a network trace, on either path.
 
 #### Scenario: Successful sign-in establishes a session
 
@@ -31,7 +35,9 @@ The application SHALL let the user sign in by entering their Garmin email addres
 
 ### Requirement: A second authentication factor is handled in the application
 
-When Garmin requires a second factor, the application SHALL report that a code is needed, state which method Garmin used to send it, and accept the code from the user. The session started by the credential step SHALL be carried into the verification step.
+When a second factor is required, the web view path SHALL let Garmin conduct it on its own page, and the application SHALL NOT prompt for a code itself. Any challenge Garmin presents there, including a captcha or a passkey, SHALL be the user's to complete rather than something the application reimplements.
+
+On the fallback path, when Garmin requires a second factor the application SHALL report that a code is needed, state which method Garmin used to send it, and accept the code from the user. The session started by the credential step SHALL be carried into the verification step.
 
 #### Scenario: A code is requested
 

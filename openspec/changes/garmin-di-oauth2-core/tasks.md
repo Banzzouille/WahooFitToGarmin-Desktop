@@ -14,6 +14,28 @@
 
 ## 2. Sign-in client
 
+The primary path is the embedded web view of D2. The programmatic requests below
+stay, behind the same interface, as the fallback: they are what D1 validates and
+what runs when the web view runtime is absent.
+
+### 2a. Web view sign-in, the primary path
+
+- [ ] 2a.1 Add `Avalonia.Controls.WebView` and confirm it resolves for the Avalonia version already pinned
+- [ ] 2a.2 Present Garmin's sign-in page in the web view, with the same client identity constants as 2.1
+- [ ] 2a.3 Detect the navigation that carries the service ticket and extract it
+- [ ] 2a.4 Hand the ticket to the same exchange the programmatic path uses, so nothing downstream knows which path produced it
+- [ ] 2a.5 Detect that the user abandoned or closed the sign-in, and report it as cancelled rather than as a failure
+- [ ] 2a.6 Discard the web view's session state after the ticket is taken, so the next sign-in starts clean
+- [ ] 2a.7 Detect a missing WebView2 runtime on Windows and report it as an instruction with a link, never as a crash or an empty window
+- [ ] 2a.8 Offer the programmatic path when the web view is unavailable
+- [ ] 2a.9 Verify a password is never read from, or written to, the web view by the application
+- [ ] 2a.10 Verify on Windows, including on a machine without the WebView2 runtime
+- [ ] 2a.11 Verify on macOS
+- [ ] 2a.12 Verify that two-step verification completes on the page, with no code prompt of our own
+- [ ] 2a.13 Record whether a passkey sign-in completes, as an observation
+
+### 2b. Programmatic sign-in, the fallback
+
 - [ ] 2.1 Define the client identity constants in one place — client identifier, service, locale, user agent — and reference them from every request
 - [ ] 2.2 Implement the sign-in request with a JSON body and the mobile headers
 - [ ] 2.3 Create the cookie container per authentication attempt and share it between sign-in and code verification

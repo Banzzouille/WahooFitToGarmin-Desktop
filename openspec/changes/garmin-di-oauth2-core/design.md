@@ -4,7 +4,9 @@
 
 Garmin's mobile application does not use that path. It posts JSON to a mobile sign-in endpoint and receives a service ticket in the response body, then exchanges the ticket for digital identity tokens. That flow still works, and a maintained implementation of it exists in `ulfdalen/scalebridge-sync` (MIT), which cites `cyberjunky/python-garminconnect` as its own upstream.
 
-An earlier draft of this design assumed all programmatic sign-in was blocked and proposed having the user copy a service ticket out of browser developer tools. That was wrong, and this revision replaces it. The correction matters beyond ergonomics: it also cancels the `webview-login-capture` change, which existed only to automate that copying.
+An earlier draft of this design assumed all programmatic sign-in was blocked and proposed having the user copy a service ticket out of browser developer tools. That was wrong, and this revision replaces it.
+
+That correction cancelled the `webview-login-capture` change, on the reasoning that a web view existed only to automate the copying. D2 revisits that conclusion: the copying was never the only thing a web view was good for, and it is now the primary path rather than a cancelled one. The separate change stays cancelled — the web view lives here, beside the flow it feeds, rather than in a change of its own.
 
 One uncertainty survives the correction and is addressed in D1.
 
@@ -12,16 +14,16 @@ One uncertainty survives the correction and is addressed in D1.
 
 **Goals:**
 - The application authenticates and uploads again.
-- Two-step verification works, with the code entered in the application.
+- Two-step verification works, including the methods a reimplementation cannot carry — passkeys, and a captcha if Garmin ever demands one.
 - The user signs in about once a month.
-- No password touches disk; tokens are encrypted at rest.
+- No password touches disk. On the primary path no password reaches the application at all; tokens are encrypted at rest.
 - The authentication surface stays small and replaceable, because Garmin will change it again.
 
 **Non-Goals:**
-- A browser-based or embedded-web-view sign-in. Unnecessary once the mobile endpoint works, and its change is cancelled.
+- A sign-in that requires the user to copy anything out of developer tools. This was the earlier draft and is what the web view removes, not what it reintroduces.
 - Supporting Garmin endpoints beyond upload.
 - Storing anything about the user beyond tokens and the identifier of the client that produced them.
-- Solving a captcha challenge, should Garmin ever require one. The sign-in payload carries an empty captcha field; if Garmin starts populating it, that is a new problem with its own change.
+- Registering an OAuth client with Garmin. There is no public registration, so there is no legitimate redirect URI and no officially sanctioned flow to implement. Both paths here are reconstructions of what Garmin's own applications do.
 
 ## Decisions
 
@@ -99,11 +101,25 @@ Record the status and whether the response still matches the existing `UploadRes
 
 Steps A and B are run twice: once with two-step verification disabled, once with it temporarily enabled, since the account used for testing does not have it on today.
 
-### D2 — Sign-in is programmatic; there is no browser and no ticket to copy
+### D2 — Garmin's own page in an embedded web view, with the programmatic post as fallback
 
-The user enters an email and a password in the application. The application posts them as JSON and reads the service ticket from the response. Nothing is scraped, and the user never opens developer tools.
+The user signs in on Garmin's real page, rendered in an embedded web view. The application watches for the redirect that carries the service ticket and takes it from there. It never sees the password.
 
-This reverses the earlier draft. It also removes the reason for `webview-login-capture`, which is cancelled rather than deferred.
+The programmatic JSON post is kept, behind the same interface, as a fallback.
+
+**Why the web view leads.** Not because two-step verification needs it — it does not. The mobile flow has a verification endpoint and the upstream implementation uses it, so codes by message, mail and authenticator application all work programmatically. The reason is the set of things a reimplementation cannot follow at all:
+
+- A captcha. The sign-in payload carries an empty captcha field, which says the server side exists. If Garmin starts populating it, the programmatic path stops working outright, with nothing to be done about it.
+- Passkeys, which Garmin offers and which cannot be driven from outside a browser.
+- Whatever Garmin does to its sign-in next. On the page, that is Garmin's problem. In a reimplementation, it is ours, and it arrives as a support report rather than as a release note.
+
+And the part no engineering argument captures: the user types their password into a Garmin page, not into a program they downloaded from a stranger. They can check the address bar. That is a different kind of assurance from a promise in a README that the password is not kept, and it is worth more than the code it costs.
+
+**Why the programmatic path stays.** The web view is not free of failure modes of its own — on Windows it depends on a runtime that is usually but not always present, and that risk is recorded below. A path that works without any browser component is a genuine fallback rather than dead weight, and it is the path D1 validates, so it will exist and be understood regardless.
+
+**Why this is cheap.** Both paths end at the same place: a service ticket. Everything after it — the exchange, the client identifier chain, refresh, storage, expiry reporting — is shared and untouched. The web view replaces step A and nothing else. Sign-in already sits behind a session abstraction so that Garmin can break it without the pipeline noticing; having two implementations of the same small step is what that abstraction was for.
+
+**What it is not.** This is not OAuth as Garmin sanctions it. There is no public client registration and therefore no legitimate redirect to a loopback address. The web view renders Garmin's genuine page and the application intercepts the resulting navigation. That is better for the user than retyping a password into a form we wrote, and it is no more official.
 
 ### D3 — One consistent iOS persona, and a client identifier chain
 
@@ -202,7 +218,9 @@ Removing the password from the live settings while leaving the backup on disk wo
 
 **Garmin changes or closes this path as well** → It has happened once already, in March 2026. The authentication surface is deliberately small and sits behind the session abstraction, so it can be replaced without touching the pipeline. Existing tokens keep working for their remaining lifetime, so a break is gradual rather than instantaneous for every user. This risk cannot be engineered away: the application depends on an interface Garmin does not publish and owes nobody.
 
-**Garmin starts requiring a captcha** → The payload already carries an empty captcha field, which suggests the server side exists. There is no good in-application answer; it would be a new change, and possibly the one place an embedded web view earns its keep.
+**Garmin starts requiring a captcha** → This is answered by D2 rather than deferred. On the web view path the challenge renders and the user solves it, as on any other site. The programmatic fallback has no answer and would simply stop working, which is one of the reasons it is the fallback and not the primary path.
+
+**The Windows web view runtime is missing** → The web view uses WebView2 on Windows, which ships with Windows 11 and is present on most Windows 10 machines, but is not guaranteed. This is a real dent in the "unzip and run, nothing to install" property the packaging work was built around. It must be detected and reported as a clear instruction with a link, never as a crash or an empty window, and the programmatic path is offered when it is absent. Verified on a machine without the runtime before release, not assumed.
 
 **A password leaks through a log or an exception** → D6 states the rule; it is verified by inspection rather than assumed, because this is the failure that matters most and the easiest to introduce by accident.
 

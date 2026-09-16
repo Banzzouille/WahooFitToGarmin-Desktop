@@ -35,7 +35,7 @@ XPF runs existing WPF XAML on Avalonia's renderer with minimal code changes, whi
 
 ### D2 — Avalonia 12, pinned, and now genuinely reversible
 
-An earlier draft of this design pinned Avalonia 12 because `Avalonia.Controls.WebView` requires it and the planned `webview-login-capture` change could not proceed otherwise. That constraint no longer exists: sign-in is programmatic, no web view is embedded, and that change is cancelled.
+An earlier draft of this design pinned Avalonia 12 because `Avalonia.Controls.WebView` requires it. That was then dropped, on the reasoning that sign-in would be programmatic and no web view would be embedded. `garmin-di-oauth2-core` D2 has since reversed that: Garmin's own page in an embedded web view is the primary sign-in path, so the requirement is live again. Avalonia 12 is what this port targets, `Avalonia.Controls.WebView` publishes for it, and no version move is needed — but the dependency is real and should not be dropped a second time.
 
 Avalonia 12 remains the choice, but on merit rather than under obligation — it is the current line, where documentation, fixes, and platform work are landing. The version is pinned exactly in `Directory.Packages.props`, and an Avalonia-level defect is a reason to reassess rather than to work around silently.
 
