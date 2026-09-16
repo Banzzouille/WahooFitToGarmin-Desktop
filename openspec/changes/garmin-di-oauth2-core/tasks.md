@@ -133,7 +133,7 @@
 
 ## 12. Attribution and follow-up
 
-- [ ] 12.1 Attribute the reconstructed flow in the source file that implements it, naming the upstream projects and their licence
+- [ ] 12.1 Attribute the reconstructed flow in the source file that implements it, naming the upstream projects and their licence: `ulfdalen/scalebridge-sync` (MIT), which cites `cyberjunky/python-garminconnect`
 - [ ] 12.2 Record the observed token lifetimes so the user-facing message about how often signing in is needed is accurate
 - [ ] 12.3 Record whether asking the service to remember the session reduces how often a code is demanded, as an observation over time rather than a gate
 - [ ] 12.4 Note for `documentation-overhaul` that the README's clear-text storage warning is now false and what replaces it

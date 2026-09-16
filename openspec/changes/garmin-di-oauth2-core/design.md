@@ -120,6 +120,28 @@ GARMIN_CONNECT_MOBILE_IOS_DI
 
 Whichever succeeds is persisted with the tokens, because refresh must present the same one. Discovering it by cascade and then hard-coding a different one for refresh would fail a day later, far from its cause.
 
+### D3a — The constants were re-read from upstream and had not moved
+
+Checked against `ulfdalen/scalebridge-sync` on 16 September 2026, after the
+design above was written from that same source. Unchanged: `GCM_IOS_DARK`, the
+service URL, the iOS user agent, the empty `captchaToken` in the sign-in body,
+and the four client identifiers in the order D3 gives — `2025Q2` is still the
+head of the chain.
+
+This is a freshness datum, not a new finding. It matters because every constant
+here is undocumented and Garmin rotates the client identifiers by quarter: the
+chain being unchanged means the design has not silently gone stale while other
+changes were being built. It is worth re-reading again immediately before
+implementation starts, and treating a moved head of the chain as a signal that
+the quarter has turned rather than as a mistake.
+
+Two implementation details from upstream that the decisions above imply but do
+not spell out. The cookie container uses public-suffix matching rather than
+plain domain matching, because sign-in and verification sit on hosts that must
+share cookies correctly. And the expiry instant is persisted next to the token
+pair and the accepted client identifier, which is what lets the interface state
+whether the session is still good instead of discovering it on the next upload.
+
 ### D4 — Sign-in and code verification share a cookie container
 
 Garmin's code verification step depends on session cookies set during sign-in. The two requests therefore share one cookie container, which lives for the duration of an authentication attempt and is discarded afterwards.
