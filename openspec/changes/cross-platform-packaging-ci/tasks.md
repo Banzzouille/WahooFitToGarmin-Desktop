@@ -15,6 +15,8 @@
 
 ## 3. Continuous integration workflow
 
+- [x] 3.0 Pin restore to nuget.org with a repository `nuget.config`, so CI, the author, and contributors resolve packages from the same place regardless of machine configuration
+
 - [x] 3.1 Add `.github/workflows/ci.yml` triggered on push and pull request
 - [x] 3.2 Configure a matrix covering a Windows runner and a macOS runner
 - [x] 3.3 Build the solution on both

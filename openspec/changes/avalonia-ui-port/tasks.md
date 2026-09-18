@@ -11,7 +11,7 @@
 - [x] 2.1 Create `WahooFitToGarmin.UI` targeting `net10.0` with no operating-system suffix, namespace `WahooFitToGarmin.UI`
 - [x] 2.2 Add Avalonia 12 and `Avalonia.Desktop`, pinning the exact version in `Directory.Packages.props`
 - [~] 2.2a No longer true, and deliberately so: `garmin-di-oauth2-core` D2 makes `Avalonia.Controls.WebView` the primary sign-in path and it publishes for Avalonia 12. Dropping to 11.3 is now a redesign, not a version bump
-- [ ] 2.2b Confirm the Avalonia developer inspector still opens in a Debug build. `Avalonia.Diagnostics` has published nothing past 11.3.22 against Avalonia 12.1.2, so NuGet resolves the mismatch upwards and the inspector may or may not work. Development-only: no shipped build references it
+- [~] 2.2b A Debug build succeeds with `Avalonia.Diagnostics` 11.3.22 against Avalonia 12.1.2: NuGet resolves the mismatch upwards with no downgrade or conflict. Whether the inspector actually opens at runtime is still unverified, and is development-only either way
 - [x] 2.3 Add FluentAvalonia
 - [~] 2.4 Not added. `DesktopNotifications` has no macOS backend and pulls `Tmds.DBus` 0.9.1, which carries a high-severity advisory. `LoggingNotifier` stands in, so the application raises no system notification on either platform
 - [x] 2.5 Reference the core library; do not reference the WPF project
