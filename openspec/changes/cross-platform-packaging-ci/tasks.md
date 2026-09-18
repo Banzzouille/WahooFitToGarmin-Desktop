@@ -34,7 +34,7 @@
 - [x] 4.2 Declare the three runtime identifiers: Windows x64, macOS Apple Silicon, macOS Intel. All three are produced by the packaging workflow
 - [x] 4.3 Confirm trimming and ahead-of-time compilation are disabled
 - [ ] 4.4 Wire the version so it comes from the build rather than from a checked-in literal
-- [ ] 4.5 Publish each configuration locally and confirm it produces a runnable output
+- [x] 4.5 Publish each configuration locally and confirm it produces a runnable output
 - [ ] 4.6 Launch the Windows output on a machine with no .NET runtime installed
 
 ## 5. macOS bundle
@@ -59,7 +59,7 @@
 
 ## 7. Release workflow
 
-- [~] 7.1 Add `.github/workflows/package.yml`, run manually rather than triggered by a tag, because releases are made by hand
+- [x] 7.1 `.github/workflows/package.yml`, run manually rather than triggered by a tag, because releases are made by hand. Verified green, producing three artefacts
 - [x] 7.2 Build the Windows artefact on a Windows runner
 - [x] 7.3 Build, bundle, and sign the macOS artefacts on a macOS runner
 - [x] 7.4 Stamp the version into the artefact names, read from the csproj rather than from a tag, since there is no tag trigger
