@@ -1,5 +1,7 @@
 ## 1. Validation gate
 
+- [ ] 1.0 Step 0: sign in to Garmin Connect by hand in a browser and record whether a `ticket=ST-…` value appears in any navigation, on which host, and whether it survives to a navigation an application could observe. Record that it appeared, never the value. **This gates D2: if no ticket is issued to a browser, the web view has nothing to capture**
+
 - [ ] 1.1 Confirm `extract-platform-agnostic-core` is merged, so the session abstraction and the pipeline exist
 - [ ] 1.2 Run the sign-in request by hand **from a residential connection**, not from a server or a container, and record the status and response shape
 - [ ] 1.3 **STOP AND RE-PLAN if the sign-in endpoint answers with a rate-limit status** — the premise that desktop clients are not blocked would be false, and the cancelled web-view approach returns as the candidate

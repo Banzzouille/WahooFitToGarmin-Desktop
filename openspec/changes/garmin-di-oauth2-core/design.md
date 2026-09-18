@@ -35,7 +35,21 @@ The most plausible reconciliation is that the block is by client reputation rath
 
 So validation runs **from the machine the application will run on**, not from a server:
 
-**Step A — sign in**
+**Step 0 — does a browser sign-in still yield a ticket?**
+
+This step exists because D2 made the web view the primary path, and the premise underneath it is untested. The context above records that Garmin closed the *web* sign-in path in March 2026. What exactly closed is not established: the consumer credentials the old OAuth1 exchange relied on, or the issuing of a service ticket to a browser at all. If it is the latter, the web view has nothing to capture and D2 is wrong.
+
+No tooling is needed and there is no rate-limit risk, because this is an ordinary sign-in performed by hand:
+
+1. Open a private browsing window with the network panel recording, preserving the log across navigations.
+2. Sign in to Garmin Connect normally, completing two-step verification as usual.
+3. Look through the navigations for a parameter shaped like `ticket=ST-…`, in a query string or a redirect `Location` header.
+
+Record whether such a value appears, on which host, and whether it survives to a navigation the application could observe. **Record that it appeared, never the value itself** — it is a live credential until it is spent.
+
+If a ticket appears, step C can be exercised with it immediately, and the primary path is validated without ever touching the rate-limited endpoint in step A. If no ticket appears, D2 is unsound as written and must be reconsidered before any web view is built.
+
+**Step A — sign in (fallback path only)**
 
 ```
 curl -i -X POST \
@@ -234,24 +248,29 @@ Removing the password from the live settings while leaving the backup on disk wo
 
 Branch `feat/garmin-mobile-auth`.
 
-1. Run the D1 validation from a residential connection, including the two-step verification pass. **Stop if step A returns 429 or step E fails.**
-2. Sign-in client: JSON request, shared cookie container, three response shapes — ticket, code required, rejected credentials.
-3. Code verification step on the same cookie container.
-4. Token exchange with the client identifier chain, refresh with the persisted identifier, single-use handling.
-5. Error classification and token redaction, with tests asserting that no token-shaped string survives into a log.
-6. Secret store abstraction with both platform implementations.
-7. Session implementation satisfying the abstraction from `extract-platform-agnostic-core`, with proactive single-flight refresh.
-8. Pipeline pause and resume on sign-in required; rate-limit delay honoured on upload.
-9. Sign-in view and code prompt in the current user interface; remove the stored password field.
-10. Purge: strip the password from settings, delete the legacy backup, drop the base64 wrapper.
-11. Delete the old authentication code, the consumer key download, and the OAuth1 dependency.
-12. End-to-end verification: first sign-in, upload, forced refresh, expiry, sign-in again — with two-step verification both off and temporarily on.
+1. Run step 0 from a residential connection. **Stop if no service ticket is issued to a browser**, because the primary path depends on one existing.
+2. Run steps C, D and E with that ticket. **Stop if step E fails**, which ends the change regardless of which sign-in path produced the ticket.
+3. Run steps A and B, including the two-step verification pass. A 429 here removes the fallback and makes the web view the only path, rather than stopping the change as it would have before D2.
+4. Web view sign-in: render Garmin's page, capture the ticket from the navigation, hand it to the exchange. This is the primary path and comes first.
+5. Sign-in client for the fallback: JSON request, shared cookie container, three response shapes — ticket, code required, rejected credentials.
+6. Code verification step on the same cookie container, for the fallback only.
+7. Token exchange with the client identifier chain, refresh with the persisted identifier, single-use handling.
+8. Error classification and token redaction, with tests asserting that no token-shaped string survives into a log.
+9. Secret store abstraction with both platform implementations.
+10. Session implementation satisfying the abstraction from `extract-platform-agnostic-core`, with proactive single-flight refresh.
+11. Pipeline pause and resume on sign-in required; rate-limit delay honoured on upload.
+12. Sign-in view and code prompt in the current user interface; remove the stored password field.
+13. Purge: strip the password from settings, delete the legacy backup, drop the base64 wrapper.
+14. Delete the old authentication code, the consumer key download, and the OAuth1 dependency.
+15. End-to-end verification: first sign-in, upload, forced refresh, expiry, sign-in again — with two-step verification both off and temporarily on.
 
-**Rollback:** revert the branch. Reverting restores code that cannot authenticate, so rollback is only meaningful before step 12; after that the choice is forward-fix, not revert. Purged passwords are not restored by a revert. This is stated so nobody treats revert as a safety net once the change has shipped.
+**Rollback:** revert the branch. Reverting restores code that cannot authenticate, so rollback is only meaningful before the end-to-end step; after that the choice is forward-fix, not revert. Purged passwords are not restored by a revert. This is stated so nobody treats revert as a safety net once the change has shipped.
 
 ## Open Questions
 
-- Does the mobile sign-in endpoint answer from a residential connection, or is the block broader than the hosting-provider hypothesis? Step A, before anything else.
+- Does a browser sign-in still hand out a service ticket at all? Step 0, before anything else. D2 rests on this and it is untested: Garmin closed *some* web path in March 2026, and which part closed was never established.
+- Does a ticket obtained in a browser behave the same at the exchange as one obtained from the mobile endpoint? Step C, using the ticket from step 0.
+- Does the mobile sign-in endpoint answer from a residential connection, or is the block broader than the hosting-provider hypothesis? Step A. This now gates the fallback rather than the whole change.
 - Does the digital identity access token work for uploads on its own, or is a second token exchange required? Step E.
 - Which client identifier is currently accepted, and how long do the two tokens actually last? Steps C and D.
 - Does the code-verification step behave the same for an authenticator application as for an emailed code? Step B, with two-step verification temporarily enabled.
