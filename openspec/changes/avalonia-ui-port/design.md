@@ -37,9 +37,11 @@ XPF runs existing WPF XAML on Avalonia's renderer with minimal code changes, whi
 
 An earlier draft of this design pinned Avalonia 12 because `Avalonia.Controls.WebView` requires it. That was then dropped, on the reasoning that sign-in would be programmatic and no web view would be embedded. `garmin-di-oauth2-core` D2 has since reversed that: Garmin's own page in an embedded web view is the primary sign-in path, so the requirement is live again. Avalonia 12 is what this port targets, `Avalonia.Controls.WebView` publishes for it, and no version move is needed — but the dependency is real and should not be dropped a second time.
 
-Avalonia 12 remains the choice, but on merit rather than under obligation — it is the current line, where documentation, fixes, and platform work are landing. The version is pinned exactly in `Directory.Packages.props`, and an Avalonia-level defect is a reason to reassess rather than to work around silently.
+Avalonia 12 is the choice on merit as well as by obligation — it is the current line, where documentation, fixes, and platform work are landing. The version is pinned exactly in `Directory.Packages.props`, and an Avalonia-level defect is a reason to reassess rather than to work around silently.
 
-What has changed is that the retreat is now real. Nothing in the solution depends on a package that exists only for Avalonia 12, so dropping to the 11.3 line costs a version bump and a compile, not a redesign. That should be verified rather than assumed: if any dependency turns out to require 12, it is worth knowing before the port is complete.
+The retreat to 11.3, which an earlier revision described as real, is gone. It was an escape hatch written while 12 was new, and the web view closed it: dropping to 11.3 would now mean giving up the primary sign-in path, which is a redesign rather than a version bump. Staying on 12 is the plan and there is no longer a cheap way off it.
+
+That is a position worth stating plainly rather than leaving implicit, because 12 is not uniformly ready. `Avalonia.Diagnostics` has published nothing past 11.3.22, so the developer tooling for the line this project targets does not yet exist for it. That package is referenced in Debug builds only, where NuGet resolves the conflicting Avalonia reference upwards to 12.1.2; whether the inspector still functions under that mismatch is untested, and it affects development only, never a shipped build. The honest reading is that 12 is current but its periphery is still catching up, and that this is the cost of the web view rather than a surprise.
 
 ### D3 — New project, WPF deleted at the end of the same branch
 
