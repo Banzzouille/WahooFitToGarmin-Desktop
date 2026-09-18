@@ -23,10 +23,10 @@
 - [x] 3.4 Run the tests on both, failing the workflow on any test failure
 - [ ] 3.5 Add the format verification step
 - [x] 3.6 Pin every third-party action to a commit identifier
-- [ ] 3.7 Confirm the workflow is green before anything else is added to it
+- [x] 3.7 Green on both legs on GitHub
 - [ ] 3.8 Verify that a deliberately broken build fails the correct leg
 - [ ] 3.9 Verify that a deliberately unformatted file fails the format step
-- [ ] 3.10 Document the equivalent local commands in the repository
+- [x] 3.10 `CONTRIBUTING.md` carries the three commands CI runs, verified to work as written
 
 ## 4. Publish configuration
 
